@@ -16,7 +16,6 @@ import WalletStore from "@/store/WalletStore";
 import ProposalStore from "@/store/ProposalStore";
 import { Key, StateValue } from "@algo-builder/algob/build/types";
 import type { LogicSigAccount } from "algosdk";
-import { getProposalLsig } from "../contract/dao";
 import indexerClient from "../config/indexer.config";
 import { SchemaType, UnknownObject } from "@/types";
 
@@ -113,11 +112,6 @@ export const searchApplicationAndAccount = async () => {
 			throw error;
 		});
 
-		const lsig: LogicSigAccount = await getProposalLsig(
-			dao_id,
-			walletStore.address
-		);
-		proposalStore.setProposalAddr(lsig.address());
 		if (daoIdStore.govt_id) {
 			const availableTokens = await getGovASATokenAmount(
 				walletStore.address,
