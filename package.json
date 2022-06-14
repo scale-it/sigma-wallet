@@ -1,6 +1,6 @@
 {
-	"name": "sigmadao-ui",
-	"description": "Sigma DAO UI",
+	"name": "algobuilder-msig",
+	"description": "Multisignature Sign UI",
 	"homepage": "https://algobuilder.dev",
 	"license": "mpl-2.0",
 	"engines": {

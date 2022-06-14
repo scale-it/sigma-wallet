@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MsigUI from "../pages/MsigUI.vue";
-import { EndPoint } from "@/types";
 
 const routes = [
 	{
