@@ -1,14 +1,4 @@
-.flexbox {
-	display: flexbox;
-}
-
 .bottom_center {
 	text-align: center;
 	margin-block: 1rem;
-}
-
-.flexbox_justify_space {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
 }

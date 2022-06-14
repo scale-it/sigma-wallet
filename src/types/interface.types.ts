@@ -6,7 +6,3 @@ export interface WalletStoreState {
 	address: string;
 	network: NetworkTypes;
 }
-
-export interface UnknownObject {
-	[key: string]: string | number | boolean;
-}
