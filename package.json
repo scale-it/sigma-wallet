@@ -1,6 +1,6 @@
 {
 	"name": "algobuilder-msig",
-	"description": "Multisignature Sign UI",
+	"description": "Multisignature UI",
 	"homepage": "https://algobuilder.dev",
 	"license": "mpl-2.0",
 	"engines": {
@@ -9,6 +9,7 @@
 	},
 	"scripts": {
 		"dev": "vue-cli-service serve",
+		"server": "nodemon backend/server.ts",
 		"build": "vue-cli-service build",
 		"lint": "yarn lint:js && yarn lint:prettier",
 		"start": "node .output/server/index.mjs",
@@ -28,7 +29,9 @@
 		"bootstrap-vue": "^2.22.0",
 		"core-js": "^3.21.1",
 		"cors": "^2.8.5",
+		"crypto-browserify": "^3.12.0",
 		"pinia": "^2.0.12",
+		"postgraphile": "^4.12.9",
 		"stream-browserify": "^3.0.0",
 		"vue": "^3.2.37",
 		"vue-router": "^4.0.14"
@@ -55,7 +58,6 @@
 		"husky": "^7.0.4",
 		"jest": "^27.5.1",
 		"lint-staged": "^12.3.5",
-		"nodemon": "^2.0.16",
 		"prettier": "^2.5.1",
 		"ts-node": "^10.7.0",
 		"typescript": "^4.6.2"
