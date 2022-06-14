@@ -105,8 +105,6 @@ import {
 	WebMode,
 } from "@algo-builder/web";
 import WalletStore from "../store/WalletStore";
-import { searchApplicationAndAccount } from "@/indexer";
-import DaoID from "@/store/DaoID";
 import {
 	openErrorNotificationWithIcon,
 	WALLET_CONNECTION_ERROR,
@@ -230,7 +228,6 @@ export default defineComponent({
 				this.walletAddresses = userAccount.map(
 					(acc: { address: string }) => acc.address
 				);
-				searchApplicationAndAccount();
 			}
 		},
 		async connectMyAlgoWallet() {
@@ -297,7 +294,6 @@ export default defineComponent({
 				const addr = e.key;
 				this.walletAddress = addr;
 				this.setAddress(addr);
-				searchApplicationAndAccount();
 				console.log("Address Switched.");
 			}
 		},
@@ -305,7 +301,6 @@ export default defineComponent({
 			console.log("Wallet Disconnected");
 			this.walletAddress = "";
 			this.setAddress("");
-			DaoID().handleLogOut();
 			this.setWalletType(WalletType.NONE);
 			this.selectedWallet = WalletType.NONE;
 		},
