@@ -4,4 +4,4 @@ const token =
 const server = process.env.ALGOSDK_URL || "http://localhost";
 const port = process.env.ALGOSDK_PORT || 4001;
 
-export { token, server, port, };
+export { token, server, port };
