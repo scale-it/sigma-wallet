@@ -4,7 +4,7 @@ Multisig webapp for Algorand ecosystem
 
 ## Setup
 
-Make sure to install the dependencies
+Install the dependencies
 
 ```bash
 yarn install
