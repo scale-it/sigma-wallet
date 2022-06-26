@@ -1,6 +1,7 @@
 @import url(./wallet.css);
 @import url(./layout.css);
 @import url(./logo.css);
+@import url(./utilities.css);
 
 html {
 	font-size: 62.5%;
