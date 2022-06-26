@@ -17,3 +17,8 @@ export enum formatTypes {
 	JSON = "JSON",
 	MSG_PACK = "MSG_PACK",
 }
+
+export enum Tabs {
+	Msig,
+	TxSender,
+}

@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
-import MsigUI from "../pages/MsigUI.vue";
+import HomePage from "../pages/HomePage.vue";
 
 const routes = [
 	{
 		path: "/",
-		name: "Msig",
-		component: MsigUI,
+		name: "HomePage",
+		component: HomePage,
 		props: true,
 	},
 ];
