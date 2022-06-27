@@ -48,7 +48,7 @@ import {
 	WallectConnectSession,
 	WebMode,
 } from "@algo-builder/web";
-import { WalletType } from "@/types";
+import { WalletType, contentlist } from "@/types";
 import { tabList } from "@/constants";
 
 export default defineComponent({
@@ -56,7 +56,7 @@ export default defineComponent({
 	data() {
 		const walletStore = WalletStore();
 
-		const contentList = {
+		const contentList: contentlist = {
 			JSON: "JSON",
 			MSG_PACK: "MSG_PACK(base64)",
 		};
