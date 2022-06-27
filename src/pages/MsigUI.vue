@@ -1,17 +1,14 @@
 <template>
-	<a-layout-content class="contentSign">
+	<a-layout-content class="content_sign">
 		<a-row>
 			<a-col :span="10">
 				<h1>Unsigned transaction</h1>
-			</a-col>
-			<a-col :span="2"> </a-col>
-			<a-col :span="12">
-				<h1>Signed transaction:</h1>
-			</a-col>
-		</a-row>
-		<a-row>
-			<a-col :span="10">
-				<div class="SignField">
+				<a-switch
+					v-model:checked="inputBase64"
+					checked-children="MSGPACK"
+					un-checked-children="JSON"
+				/>
+				<div class="sign_field">
 					<a-textarea
 						v-model:value="unsignedJson"
 						placeholder="Base64 or JSON object"
@@ -20,16 +17,9 @@
 					/>
 				</div>
 				<a-button type="primary" @click="sign">SIGN</a-button>
-				<div class="switchButton">
-					<a-switch
-						v-model:checked="inputBase64"
-						checked-children="MSGPACK"
-						un-checked-children="JSON"
-					/>
-				</div>
 			</a-col>
-			<a-col :span="2"> </a-col>
-			<a-col :span="12">
+			<a-col :span="12" :offset="2">
+				<h1>Signed transaction</h1>
 				<a-card
 					style="width: 100%"
 					title="Format Transaction"
@@ -59,36 +49,21 @@ import {
 	WebMode,
 } from "@algo-builder/web";
 import { WalletType } from "@/types";
+import { tabList } from "@/constants";
 
 export default defineComponent({
 	name: "Multisignature UI",
 	data() {
 		const walletStore = WalletStore();
-		return {
-			unsignedJson: "",
-			signedJson: "",
-			buttonClass: "btn btn-danger",
-			formControl: "form-control",
-			walletStore,
-			Transaction,
-		};
-	},
-	setup() {
-		const tabList = [
-			{
-				key: "JSON",
-				tab: "JSON",
-			},
-			{
-				key: "MSG_PACK",
-				tab: "MSG_PACK",
-			},
-		];
 
 		const contentList = {
 			JSON: "JSON",
 			MSG_PACK: "MSG_PACK(base64)",
 		};
+
+		const state = reactive({
+			inputBase64: false,
+		});
 
 		const key = ref("tab1");
 
@@ -99,15 +74,18 @@ export default defineComponent({
 			}
 		};
 
-		const state = reactive({
-			inputBase64: false,
-		});
 		return {
-			...toRefs(state),
+			unsignedJson: "",
+			signedJson: "",
+			buttonClass: "btn btn-danger",
+			formControl: "form-control",
+			walletStore,
+			Transaction,
 			tabList,
+			contentList,
+			...toRefs(state),
 			key,
 			onTabChange,
-			contentList,
 		};
 	},
 	methods: {
@@ -127,7 +105,7 @@ export default defineComponent({
 					break;
 				}
 				default: {
-					console.log("Not thing");
+					console.log("Invalid wallet type connected");
 					break;
 				}
 			}

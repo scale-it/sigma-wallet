@@ -7,3 +7,13 @@ export const MAIN_NET_URL = "https://node.algoexplorerapi.io";
 export const TEST_NET_URL = "https://node.testnet.algoexplorerapi.io";
 export const BETA_NET_URL = "https://node.betanet.algoexplorerapi.io";
 export const ALGO_BUILDER_URL = "https://algobuilder.dev/";
+export const tabList = [
+	{
+		key: "JSON",
+		tab: "JSON",
+	},
+	{
+		key: "MSG_PACK",
+		tab: "MSG_PACK",
+	},
+];
