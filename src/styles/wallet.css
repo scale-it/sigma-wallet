@@ -3,3 +3,12 @@
 	margin-left: auto !important;
 	min-width: 200px;
 }
+
+.SignField {
+	margin: 0px 0px 10px 0px;
+}
+
+.switchButton {
+	margin-left: 10px;
+	display: inline;
+}

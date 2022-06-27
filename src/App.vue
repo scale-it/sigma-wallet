@@ -1,6 +1,6 @@
 <template>
 	<div class="app_root">
-		<WalletConnectVue />
+		<AppHeader />
 		<div class="margin_top_sm">
 			<router-view />
 		</div>
@@ -11,11 +11,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import AppFooter from "./components/AppFooter.vue";
-import WalletConnectVue from "./components/WalletConnect.vue";
+import AppHeader from "./components/AppHeader.vue";
 
 export default defineComponent({
 	name: "App",
-	components: { AppFooter, WalletConnectVue },
+	components: { AppFooter, AppHeader },
 });
 </script>
 

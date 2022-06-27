@@ -4,6 +4,11 @@ const webpack = require("webpack");
 module.exports = defineConfig({
 	transpileDependencies: true,
 	configureWebpack: {
+		devServer: {
+			headers: { "Access-Control-Allow-Origin": "*" },
+			// https: true,
+		},
+
 		resolve: {
 			fallback: {
 				crypto: require.resolve("crypto-browserify"),
