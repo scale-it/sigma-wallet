@@ -1,3 +1,5 @@
+import { formatTypes } from "@/types";
+
 export const walletMessage = {
 	NETWORK_ISSUE: (walletType: string) =>
 		`Please select a network to connect with ${walletType}`,
@@ -9,11 +11,11 @@ export const BETA_NET_URL = "https://node.betanet.algoexplorerapi.io";
 export const ALGO_BUILDER_URL = "https://algobuilder.dev/";
 export const tabList = [
 	{
-		key: "JSON",
-		tab: "JSON",
+		key: formatTypes.JSON,
+		tab: formatTypes.JSON,
 	},
 	{
-		key: "MSG_PACK",
-		tab: "MSG_PACK",
+		key: formatTypes.MSG_PACK,
+		tab: formatTypes.MSG_PACK,
 	},
 ];
