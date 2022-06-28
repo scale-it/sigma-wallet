@@ -3,11 +3,6 @@
 		<a-row>
 			<a-col :span="10">
 				<h1>Unsigned transaction</h1>
-				<a-switch
-					v-model:checked="inputBase64"
-					checked-children="MSGPACK"
-					un-checked-children="JSON"
-				/>
 				<div class="sign_field">
 					<a-textarea
 						v-model:value="unsignedJson"
@@ -16,6 +11,13 @@
 						allow-clear
 					/>
 				</div>
+				<span class="switch_button">
+					<a-switch
+						v-model:checked="inputBase64"
+						checked-children="MSGPACK"
+						un-checked-children="JSON"
+					/>
+				</span>
 				<a-button type="primary" @click="sign">SIGN</a-button>
 			</a-col>
 			<a-col :span="12" :offset="2">
