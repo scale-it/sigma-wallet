@@ -1,7 +1,7 @@
 <template>
 	<a-layout-content class="content_sign">
 		<a-row>
-			<a-col :span="10">
+			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
 				<h1>Unsigned transaction</h1>
 				<div class="sign_field">
 					<a-textarea
@@ -20,7 +20,7 @@
 				</span>
 				<a-button type="primary" @click="sign">SIGN</a-button>
 			</a-col>
-			<a-col :span="12" :offset="2">
+			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
 				<h1>Signed transaction</h1>
 				<a-card
 					style="width: 100%"
