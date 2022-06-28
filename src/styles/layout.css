@@ -3,14 +3,6 @@
 	margin-block: 1rem;
 }
 
-.padding_med {
-	padding: 1.5rem;
-}
-
-.header {
-	display: flex;
-}
-
 .content_sign {
 	padding: 20px 50px;
 	background: whitesmoke;
@@ -18,22 +10,4 @@
 
 .header {
 	display: flex;
-}
-
-.content_sign {
-	padding: 20px 50px;
-	background: whitesmoke;
-}
-
-.padding_med {
-	padding: 1.5rem;
-}
-
-.header {
-	display: flex;
-}
-
-.content_sign {
-	padding: 20px 50px;
-	background: whitesmoke;
 }

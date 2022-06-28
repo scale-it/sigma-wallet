@@ -54,6 +54,7 @@ import { defineComponent, createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import WalletStore from "@/store/WalletStore";
+import { isJson } from "../utilities/validate";
 
 export default defineComponent({
 	data() {
@@ -84,14 +85,6 @@ export default defineComponent({
 		};
 	},
 	methods: {
-		isJson(str) {
-			try {
-				JSON.parse(str);
-			} catch (e) {
-				return false;
-			}
-			return true;
-		},
 		openConfirmationModal() {
 			if (!this.txInput) {
 				this.txInputError = "Please input your transaction";
@@ -105,7 +98,7 @@ export default defineComponent({
 		},
 		txInput() {
 			if (this.isJsonSelected) {
-				if (this.isJson(this.txInput)) {
+				if (isJson(this.txInput)) {
 					this.txInputError = "";
 					this.txOutput = JSON.stringify(JSON.parse(this.txInput), null, 4); // format JSON
 				} else {
