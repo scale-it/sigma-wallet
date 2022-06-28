@@ -12,3 +12,8 @@ export enum NetworkTypes {
 	BETA_NET = "BetaNet",
 	PRIVATE_NET = "PrivateNet", // only for testing, to be removed, Wallet connect and MyAlgo wallet doesn't support it
 }
+
+export enum formatTypes {
+	JSON = "JSON",
+	MSG_PACK = "MSG_PACK",
+}
