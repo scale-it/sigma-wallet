@@ -1,53 +1,52 @@
 <template>
-	<a-row>
-		<a-col :span="10">
-			<h2>Transaction Input</h2>
-		</a-col>
-		<a-col :offset="4" :span="10">
-			<h2>Transaction preview</h2>
-		</a-col>
-	</a-row>
-	<a-switch
-		v-model:checked="isJsonSelected"
-		checked-children="json"
-		un-checked-children="msgpack"
-	/>
-	<a-row class="margin_top_med">
-		<a-col :span="10">
-			<a-textarea v-model:value="txInput" :rows="4" allow-clear />
-			<div v-if="txInputError" class="margin_top_med">
-				<a-alert
-					message="Error"
-					:description="txInputError"
-					type="error"
-					show-icon
-					closable
-					@close="txInputError = ''"
+	<a-layout-content class="content_sign">
+		<a-row>
+			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
+				<h1>Transaction Input</h1>
+				<a-switch
+					v-model:checked="isJsonSelected"
+					checked-children="json"
+					un-checked-children="msgpack"
 				/>
-			</div>
-		</a-col>
-
-		<a-col :offset="4" :span="10">
-			<a-textarea
-				auto-size
-				:bordered="false"
-				v-model:value="txOutput"
-				:disabled="true"
-			/>
-		</a-col>
-	</a-row>
-	<a-row class="margin_top_large">
-		<a-col :offset="14" :span="4">
-			<div>
+				<a-textarea
+					class="margin_top_med"
+					v-model:value="txInput"
+					:rows="20"
+					allow-clear
+				/>
+				<div v-if="txInputError" class="margin_top_med">
+					<a-alert
+						message="Error"
+						:description="txInputError"
+						type="error"
+						show-icon
+						closable
+						@close="txInputError = ''"
+					/>
+				</div>
+			</a-col>
+			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
+				<h1>Transaction preview</h1>
+				<a-textarea
+					:style="
+						txOutput.length &&
+						'background-color: white !important; color: black !important'
+					"
+					auto-size
+					:bordered="false"
+					v-model:value="txOutput"
+					:disabled="true"
+				/>
 				<a-button
+					class="margin_top_med"
 					type="primary"
 					@click="openConfirmationModal"
 					:disabled="!txOutput"
 					>Send</a-button
 				>
-			</div>
-		</a-col>
-	</a-row>
+			</a-col>
+		</a-row>
+	</a-layout-content>
 </template>
 
 <script>
@@ -110,10 +109,15 @@ export default defineComponent({
 					this.txInputError = "";
 					this.txOutput = JSON.stringify(JSON.parse(this.txInput), null, 4); // format JSON
 				} else {
+					this.txOutput = "";
 					this.txInputError = "Please input valid JSON transaction";
 				}
 			} else {
 				console.log("msgpack");
+			}
+			if (!this.txInput && this.txOutput) {
+				this.txOutput = "";
+				this.txInputError = "";
 			}
 		},
 	},

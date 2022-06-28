@@ -1,5 +1,5 @@
 <template>
-	<a-tabs v-model:activeKey="activeKey" type="card">
+	<a-tabs centered v-model:activeKey="activeKey" type="card">
 		<a-tab-pane :key="Tabs.MultiSig" tab="MultiSig">
 			<msig />
 		</a-tab-pane>
