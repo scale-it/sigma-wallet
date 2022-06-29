@@ -1,5 +1,5 @@
 <template>
-	<div class="app_root">
+	<div class="padding_med">
 		<AppHeader />
 		<div class="margin_top_sm">
 			<router-view />

@@ -3,15 +3,11 @@
 	margin-block: 1rem;
 }
 
-.margin_top_large {
-	margin-top: 3rem;
+.content_sign {
+	padding: 20px 50px;
+	background: whitesmoke;
 }
 
 .header {
 	display: flex;
-}
-
-.content_sign {
-	padding: 20px 50px;
-	background: whitesmoke;
 }
