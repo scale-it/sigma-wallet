@@ -92,6 +92,11 @@ export default defineComponent({
 	},
 	methods: {
 		sign() {
+			let Txn;
+			let signedTxn
+			if (this.inputBase64) {
+				Txn = this.unsignedJson;
+			}
 			switch (this.walletStore.walletKind) {
 				case WalletType.MY_ALGO: {
 					let signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
@@ -99,6 +104,7 @@ export default defineComponent({
 				}
 				case WalletType.ALGOSIGNER: {
 					let signAlgoSigner = this.walletStore.webMode as WebMode;
+					
 					break;
 				}
 				case WalletType.WALLET_CONNECT: {
