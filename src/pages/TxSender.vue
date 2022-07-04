@@ -120,7 +120,7 @@ export default defineComponent({
 			}
 			this.walletStore.webMode
 				.sendAndWait(encodedTx)
-				.then((response: any) => {
+				.then((response: algosdk.modelsv2.PendingTransactionResponse) => {
 					// confirmed tx response
 					this.txOutput = formatJSON(response);
 					successMessage(this.key);
