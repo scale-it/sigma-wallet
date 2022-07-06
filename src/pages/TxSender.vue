@@ -71,6 +71,11 @@ import {
 	TRANSACTION_SEND_SUCCESSFUL,
 } from "@/constants";
 import { WalletType } from "@/types";
+import {
+	MyAlgoWalletSession,
+	WallectConnectSession,
+	WebMode,
+} from "@algo-builder/web";
 
 export default defineComponent({
 	data() {
@@ -99,6 +104,17 @@ export default defineComponent({
 				onOk: this.sendTx,
 			});
 		},
+		formatConfirmedResponse(
+			response: algosdk.modelsv2.PendingTransactionResponse
+		) {
+			this.txOutput = formatJSON(response);
+			successMessage(this.key);
+			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
+		},
+		displayError(error: Error) {
+			errorMessage(this.key);
+			openErrorNotificationWithIcon(error.message);
+		},
 		async sendTx() {
 			loadingMessage(this.key);
 			let encodedTx: Uint8Array | string;
@@ -118,18 +134,30 @@ export default defineComponent({
 					);
 				} else encodedTx = convertBase64ToUnit8Array(this.txInput);
 			}
-			this.walletStore.webMode
-				.sendAndWait(encodedTx)
-				.then((response: algosdk.modelsv2.PendingTransactionResponse) => {
-					// confirmed tx response
-					this.txOutput = formatJSON(response);
-					successMessage(this.key);
-					openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
-				})
-				.catch((error: Error) => {
-					errorMessage(this.key);
-					openErrorNotificationWithIcon(error.message);
-				});
+			try {
+				let response;
+				switch (this.walletStore.walletKind) {
+					case WalletType.ALGOSIGNER: {
+						const webmode = this.walletStore.webMode as WebMode;
+						response = await webmode.sendAndWait(encodedTx as string);
+						break;
+					}
+					case WalletType.MY_ALGO: {
+						const algoWallet = this.walletStore.webMode as MyAlgoWalletSession;
+						response = await algoWallet.sendAndWait(encodedTx as Uint8Array);
+						break;
+					}
+					case WalletType.WALLET_CONNECT: {
+						const walletConnect = this.walletStore
+							.webMode as WallectConnectSession;
+						response = await walletConnect.sendAndWait(encodedTx as Uint8Array);
+						break;
+					}
+				}
+				response && this.formatConfirmedResponse(response);
+			} catch (error) {
+				this.displayError(error);
+			}
 		},
 		openConfirmationModal() {
 			if (!this.txInput) {
