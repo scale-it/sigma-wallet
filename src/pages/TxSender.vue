@@ -32,7 +32,7 @@
 						txOutput.length &&
 						'background-color: white !important; color: black !important'
 					"
-					auto-size
+					:auto-size="{ maxRows: 22 }"
 					:bordered="false"
 					v-model:value="txOutput"
 					:disabled="true"
@@ -49,69 +49,162 @@
 	</a-layout-content>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import WalletStore from "@/store/WalletStore";
-import { isJson } from "../utilities/validate";
+import {
+	isJson,
+	convertBase64ToUnit8Array,
+	formatJSON,
+	convertObjectValuesToUnit8Array,
+	convertToBase64,
+} from "@/utilities";
+import algosdk from "algosdk";
+import {
+	errorMessage,
+	loadingMessage,
+	openErrorNotificationWithIcon,
+	openSuccessNotificationWithIcon,
+	successMessage,
+	TRANSACTION_SEND_SUCCESSFUL,
+} from "@/constants";
+import { WalletType } from "@/types";
+import {
+	MyAlgoWalletSession,
+	WallectConnectSession,
+	WebMode,
+} from "@algo-builder/web";
 
 export default defineComponent({
 	data() {
 		return {
 			isJsonSelected: true,
-			txInput: "",
+			txInput: undefined,
 			txOutput: "",
 			txInputError: "",
+			key: "SenderKey",
 		};
 	},
 	setup() {
 		const walletStore = WalletStore();
-		const sendTx = async () => {
-			console.log("send transaction");
+		return {
+			walletStore,
 		};
-		const confirm = () => {
+	},
+	methods: {
+		confirm() {
 			Modal.confirm({
 				title: "Confirm",
 				icon: createVNode(ExclamationCircleOutlined),
 				okText: "Ok",
 				cancelText: "Cancel",
 				centered: true,
-				onOk: sendTx,
+				onOk: this.sendTx,
 			});
-		};
-		return {
-			confirm,
-		};
-	},
-	methods: {
+		},
+		formatConfirmedResponse(
+			response: algosdk.modelsv2.PendingTransactionResponse
+		) {
+			this.txOutput = formatJSON(response);
+			successMessage(this.key);
+			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
+		},
+		displayError(error: Error) {
+			errorMessage(this.key);
+			openErrorNotificationWithIcon(error.message);
+		},
+		async sendTx() {
+			loadingMessage(this.key);
+			let encodedTx: Uint8Array | string;
+			if (!this.txInput) return;
+			// algosigner accepts base64 not unit8Array
+			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
+				if (this.isJsonSelected) {
+					encodedTx = convertToBase64(
+						convertObjectValuesToUnit8Array(JSON.parse(this.txInput)["blob"])
+					);
+				} else encodedTx = this.txInput;
+			} else {
+				if (this.isJsonSelected) {
+					// decode blob back to unit8Array
+					encodedTx = convertObjectValuesToUnit8Array(
+						JSON.parse(this.txInput)["blob"]
+					);
+				} else encodedTx = convertBase64ToUnit8Array(this.txInput);
+			}
+			try {
+				let response;
+				switch (this.walletStore.walletKind) {
+					case WalletType.ALGOSIGNER: {
+						const webmode = this.walletStore.webMode as WebMode;
+						response = await webmode.sendAndWait(encodedTx as string);
+						break;
+					}
+					case WalletType.MY_ALGO: {
+						const algoWallet = this.walletStore.webMode as MyAlgoWalletSession;
+						response = await algoWallet.sendAndWait(encodedTx as Uint8Array);
+						break;
+					}
+					case WalletType.WALLET_CONNECT: {
+						const walletConnect = this.walletStore
+							.webMode as WallectConnectSession;
+						response = await walletConnect.sendAndWait(encodedTx as Uint8Array);
+						break;
+					}
+				}
+				response && this.formatConfirmedResponse(response);
+			} catch (error) {
+				this.displayError(error);
+			}
+		},
 		openConfirmationModal() {
 			if (!this.txInput) {
 				this.txInputError = "Please input your transaction";
 			} else this.confirm();
 		},
-	},
-	watch: {
-		// update the preview whenever type is changed
-		isJsonSelected() {
-			this.txOutput = "";
-		},
-		txInput() {
-			if (this.isJsonSelected) {
-				if (isJson(this.txInput)) {
-					this.txInputError = "";
-					this.txOutput = JSON.stringify(JSON.parse(this.txInput), null, 4); // format JSON
+		handleInputPreviewChange() {
+			if (this.txInput) {
+				if (this.isJsonSelected) {
+					if (isJson(this.txInput)) {
+						// JSON is valid
+						this.txInputError = "";
+						this.txOutput = formatJSON(JSON.parse(this.txInput)); // format JSON
+					} else {
+						// JSON is invalid
+						this.txOutput = "";
+						this.txInputError = "Please input valid JSON transaction";
+					}
 				} else {
-					this.txOutput = "";
-					this.txInputError = "Please input valid JSON transaction";
+					// msgpack is selected
+					this.txInputError = "";
+					try {
+						// decode msgpack to unit8Array
+						const decodedTx = algosdk.decodeSignedTransaction(
+							convertBase64ToUnit8Array(this.txInput)
+						);
+						this.txOutput = JSON.stringify(decodedTx, null, 4);
+					} catch (error) {
+						this.txInputError = error.message;
+					}
 				}
 			} else {
-				console.log("msgpack");
+				// input is removed but preview still exists
+				if (this.txOutput) {
+					this.txOutput = "";
+					this.txInputError = "";
+				}
 			}
-			if (!this.txInput && this.txOutput) {
-				this.txOutput = "";
-				this.txInputError = "";
-			}
+		},
+	},
+	watch: {
+		// update the preview and error whenever type and input is changed
+		isJsonSelected() {
+			this.handleInputPreviewChange();
+		},
+		txInput() {
+			this.handleInputPreviewChange();
 		},
 	},
 });
