@@ -5,10 +5,11 @@
 				<h1>Transaction Input</h1>
 				<a-switch
 					v-model:checked="isJsonSelected"
-					checked-children="json"
-					un-checked-children="msgpack"
+					checked-children="JSON"
+					un-checked-children="Base64 Msgpack"
 				/>
 				<a-textarea
+					placeholder="Base64 msgpack or JSON object"
 					class="margin_top_med"
 					v-model:value="txInput"
 					:rows="20"
