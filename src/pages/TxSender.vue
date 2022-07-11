@@ -3,10 +3,12 @@
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
 				<h1>Transaction Input</h1>
+				<!-- TODO: Currently disabled for JSON -->
 				<a-switch
-					v-model:checked="isJsonSelected"
-					checked-children="JSON"
-					un-checked-children="Base64 Msgpack"
+					v-model:checked="isMsgPackSelected"
+					checked-children="Base64 Msgpack"
+					un-checked-children="JSON"
+					:disabled="true"
 				/>
 				<a-textarea
 					placeholder="Base64 msgpack or JSON object"
@@ -81,7 +83,7 @@ import {
 export default defineComponent({
 	data() {
 		return {
-			isJsonSelected: true,
+			isMsgPackSelected: true,
 			txInput: undefined,
 			txOutput: "",
 			txInputError: "",
@@ -122,13 +124,13 @@ export default defineComponent({
 			if (!this.txInput) return;
 			// algosigner accepts base64 not unit8Array
 			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
-				if (this.isJsonSelected) {
+				if (!this.isMsgPackSelected) {
 					encodedTx = convertToBase64(
 						convertObjectValuesToUnit8Array(JSON.parse(this.txInput)["blob"])
 					);
 				} else encodedTx = this.txInput;
 			} else {
-				if (this.isJsonSelected) {
+				if (!this.isMsgPackSelected) {
 					// decode blob back to unit8Array
 					encodedTx = convertObjectValuesToUnit8Array(
 						JSON.parse(this.txInput)["blob"]
@@ -167,7 +169,7 @@ export default defineComponent({
 		},
 		handleInputPreviewChange() {
 			if (this.txInput) {
-				if (this.isJsonSelected) {
+				if (!this.isMsgPackSelected) {
 					if (isJson(this.txInput)) {
 						// JSON is valid
 						this.txInputError = "";
@@ -180,14 +182,16 @@ export default defineComponent({
 				} else {
 					// msgpack is selected
 					this.txInputError = "";
-					try {
-						// decode msgpack to unit8Array
-						const decodedTx = algosdk.decodeSignedTransaction(
-							convertBase64ToUnit8Array(this.txInput)
-						);
-						this.txOutput = JSON.stringify(decodedTx, null, 4);
-					} catch (error) {
-						this.txInputError = error.message;
+					if (this.txInput) {
+						try {
+							// decode msgpack to unit8Array
+							const decodedTx = algosdk.decodeSignedTransaction(
+								convertBase64ToUnit8Array(this.txInput)
+							);
+							this.txOutput = JSON.stringify(decodedTx, null, 4);
+						} catch (error) {
+							this.txInputError = error.message;
+						}
 					}
 				}
 			} else {
@@ -201,7 +205,7 @@ export default defineComponent({
 	},
 	watch: {
 		// update the preview and error whenever type and input is changed
-		isJsonSelected() {
+		isMsgPackSelected() {
 			this.handleInputPreviewChange();
 		},
 		txInput() {
