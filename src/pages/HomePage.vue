@@ -1,6 +1,6 @@
 <template>
 	<a-tabs centered v-model:activeKey="activeKey" type="card">
-		<a-tab-pane :key="Tabs.MultiSig" tab="MultiSig">
+		<a-tab-pane :key="Tabs.Msig" tab="MultiSig">
 			<msig />
 		</a-tab-pane>
 		<a-tab-pane :key="Tabs.TxSender" tab="Tx Sender">
