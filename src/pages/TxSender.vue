@@ -41,10 +41,29 @@
 					class="margin_top_med"
 					type="primary"
 					@click="openConfirmationModal"
-					:disabled="!txOutput"
+					:disabled="!txOutput || isSendDisabled"
 					>Send</a-button
 				>
 			</a-col>
+		</a-row>
+		<a-row v-if="confirmedResponse" class="margin_top_med">
+			<div>
+				<h1>Transaction Receipt</h1>
+				<div>
+					<h4>
+						<a href="https://algoexplorer.io/" target="_blank"
+							>Open Algo Explorer</a
+						>
+					</h4>
+				</div>
+			</div>
+			<a-textarea
+				style="background-color: white !important; color: black !important"
+				:auto-size="{ maxRows: 22 }"
+				:bordered="false"
+				v-model:value="confirmedResponse"
+				:disabled="true"
+			/>
 		</a-row>
 	</a-layout-content>
 </template>
@@ -85,6 +104,8 @@ export default defineComponent({
 			txOutput: "",
 			txInputError: "",
 			key: "SenderKey",
+			confirmedResponse: "",
+			isSendDisabled: false,
 		};
 	},
 	setup() {
@@ -107,7 +128,8 @@ export default defineComponent({
 		formatConfirmedResponse(
 			response: algosdk.modelsv2.PendingTransactionResponse
 		) {
-			this.txOutput = formatJSON(response);
+			this.confirmedResponse = formatJSON(response);
+			this.isSendDisabled = true;
 			successMessage(this.key);
 			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
 		},
@@ -189,12 +211,15 @@ export default defineComponent({
 						this.txInputError = error.message;
 					}
 				}
+				if (this.isSendDisabled && this.txOutput) {
+					this.isSendDisabled = false;
+				}
 			} else {
 				// input is removed but preview still exists
 				if (this.txOutput) {
 					this.txOutput = "";
-					this.txInputError = "";
 				}
+				this.txInputError = "";
 			}
 		},
 	},
