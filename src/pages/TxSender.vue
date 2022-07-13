@@ -11,7 +11,7 @@
 					:disabled="true"
 				/>
 				<a-textarea
-					placeholder="Base64 msgpack or JSON object"
+					:placeholder="isMsgPackSelected ? 'Base64 msgpack' : 'JSON object'"
 					class="margin_top_med"
 					v-model:value="txInput"
 					:rows="20"
