@@ -8,7 +8,6 @@
 					v-model:checked="isMsgPackSelected"
 					checked-children="Base64 Msgpack"
 					un-checked-children="JSON"
-					:disabled="true"
 				/>
 				<a-textarea
 					:placeholder="isMsgPackSelected ? 'Base64 msgpack' : 'JSON object'"
@@ -59,10 +58,10 @@ import { Modal } from "ant-design-vue";
 import WalletStore from "@/store/WalletStore";
 import {
 	isJson,
-	convertBase64ToUnit8Array,
-	formatJSON,
-	convertObjectValuesToUnit8Array,
+	convertBase64ToUint8Array,
+	prettifyJSON,
 	convertToBase64,
+	decodeSignedMsigTransaction,
 } from "@/utilities";
 import algosdk from "algosdk";
 import {
@@ -110,7 +109,7 @@ export default defineComponent({
 		formatConfirmedResponse(
 			response: algosdk.modelsv2.PendingTransactionResponse
 		) {
-			this.txOutput = formatJSON(response);
+			this.txOutput = prettifyJSON(response);
 			successMessage(this.key);
 			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
 		},
@@ -122,20 +121,18 @@ export default defineComponent({
 			loadingMessage(this.key);
 			let encodedTx: Uint8Array | string;
 			if (!this.txInput) return;
-			// algosigner accepts base64 not unit8Array
+			// algosigner accepts base64 not Uint8Array
 			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
 				if (!this.isMsgPackSelected) {
 					encodedTx = convertToBase64(
-						convertObjectValuesToUnit8Array(JSON.parse(this.txInput)["blob"])
+						decodeSignedMsigTransaction(JSON.parse(this.txInput))
 					);
 				} else encodedTx = this.txInput;
 			} else {
 				if (!this.isMsgPackSelected) {
-					// decode blob back to unit8Array
-					encodedTx = convertObjectValuesToUnit8Array(
-						JSON.parse(this.txInput)["blob"]
-					);
-				} else encodedTx = convertBase64ToUnit8Array(this.txInput);
+					// decode blob back to Uint8Array
+					encodedTx = decodeSignedMsigTransaction(JSON.parse(this.txInput));
+				} else encodedTx = convertBase64ToUint8Array(this.txInput);
 			}
 			try {
 				let response;
@@ -173,7 +170,7 @@ export default defineComponent({
 					if (isJson(this.txInput)) {
 						// JSON is valid
 						this.txInputError = "";
-						this.txOutput = formatJSON(JSON.parse(this.txInput)); // format JSON
+						this.txOutput = prettifyJSON(JSON.parse(this.txInput)); // format JSON
 					} else {
 						// JSON is invalid
 						this.txOutput = "";
@@ -184,9 +181,9 @@ export default defineComponent({
 					this.txInputError = "";
 					if (this.txInput) {
 						try {
-							// decode msgpack to unit8Array
+							// decode msgpack to Uint8Array
 							const decodedTx = algosdk.decodeSignedTransaction(
-								convertBase64ToUnit8Array(this.txInput)
+								convertBase64ToUint8Array(this.txInput)
 							);
 							this.txOutput = JSON.stringify(decodedTx, null, 4);
 						} catch (error) {
