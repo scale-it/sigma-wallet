@@ -51,9 +51,7 @@
 				<h1>Transaction Receipt</h1>
 				<div>
 					<h4>
-						<a href="https://algoexplorer.io/" target="_blank"
-							>Open Algo Explorer</a
-						>
+						<a :href="algoExplorerURl" target="_blank">Open in Algo Explorer</a>
 					</h4>
 				</div>
 			</div>
@@ -112,6 +110,7 @@ export default defineComponent({
 		const walletStore = WalletStore();
 		return {
 			walletStore,
+			algoExplorerURl: walletStore.algoExplorerURL,
 		};
 	},
 	methods: {
@@ -130,6 +129,10 @@ export default defineComponent({
 		) {
 			this.confirmedResponse = formatJSON(response);
 			this.isSendDisabled = true;
+			const txID = algosdk.Transaction.from_obj_for_encoding(
+				response.txn.txn
+			).txID();
+			this.algoExplorerURl.concat(txID);
 			successMessage(this.key);
 			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
 		},

@@ -13,6 +13,7 @@ export default defineStore("WalletStore", {
 			webMode: <WebModeTypes>{},
 			address: "",
 			network: NetworkTypes.NONE,
+			algoExplorerURL: "", // to get transaction details
 		};
 	},
 	getters: {
@@ -34,6 +35,19 @@ export default defineStore("WalletStore", {
 		setNetworkTypes(network: NetworkTypes) {
 			console.log("Network Changed: ", network);
 			this.network = network;
+			this.setAlgoExplorerUrl();
+		},
+		setAlgoExplorerUrl() {
+			switch (this.network) {
+				case NetworkTypes.MAIN_NET:
+					this.algoExplorerURL =
+						"https://algoindexer.algoexplorerapi.io/v2/transactions/";
+					break;
+				case NetworkTypes.TEST_NET:
+					this.algoExplorerURL =
+						"https://algoindexer.testnet.algoexplorerapi.io/v2/transactions/";
+					break;
+			}
 		},
 	},
 });
