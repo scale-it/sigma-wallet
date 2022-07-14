@@ -117,6 +117,9 @@ export default defineComponent({
 					let JsonObject = algosdk.decodeObj(
 						Buffer.from(TxnBase64, "base64")
 					) as algosdk.EncodedSignedTransaction;
+					console.log("Input transaction:");
+					console.log(JsonObject);
+					
 					let msig = algosdk.Transaction.from_obj_for_encoding(JsonObject.txn);
 					const bytes = algosdk.encodeObj(msig.get_obj_for_encoding());
 					console.log(
@@ -150,7 +153,10 @@ export default defineComponent({
 					let blob1 = Uint8Array.from(Buffer.from(TxnBase64, "base64"));
 					let blob2 = Uint8Array.from(Buffer.from(blob, "base64"));
 					let combineBlob = algosdk.mergeMultisigTransactions([blob1, blob2]);
+					let newTransaction = algosdk.decodeObj(combineBlob);
 					console.log("New blob: " + combineBlob);
+					console.log("New signed transaction: ");
+					console.log(newTransaction);
 
 					let outputBase64 = Buffer.from(combineBlob).toString("base64");
 					this.contentList.MSG_PACK = outputBase64;
@@ -170,10 +176,12 @@ export default defineComponent({
 						Buffer.from(TxnBase64, "base64")
 					);
 					console.log(Trxs);
+					console.log(this.walletStore.address);
 					let signedJson = await signWalletConnect.signTransactionGroup([
 						{
 							txn: Trxs,
 							shouldSign: true,
+							signers: this.walletStore.address,
 						},
 					]);
 					console.log(signedJson);
