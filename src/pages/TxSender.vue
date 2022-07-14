@@ -52,7 +52,7 @@
 				<div>
 					<h4>
 						<a href="https://algoexplorer.io/" target="_blank"
-							>Open Algo Explorer</a
+							>Open in Algo Explorer</a
 						>
 					</h4>
 				</div>
