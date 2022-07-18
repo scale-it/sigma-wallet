@@ -2,8 +2,7 @@
 	<a-layout-content class="content_sign">
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
-				<h1>Transaction Input</h1>
-				<!-- TODO: Currently disabled for JSON -->
+				<h2>Transaction Input</h2>
 				<a-switch
 					v-model:checked="isMsgPackSelected"
 					checked-children="Base64 Msgpack"
@@ -29,7 +28,7 @@
 				</div>
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
-				<h1>Transaction preview</h1>
+				<h2>Transaction preview</h2>
 				<a-textarea
 					:style="
 						txOutput.length &&
@@ -44,10 +43,27 @@
 					class="margin_top_med"
 					type="primary"
 					@click="openConfirmationModal"
-					:disabled="!txOutput"
+					:disabled="!txOutput || isSendDisabled"
 					>Send</a-button
 				>
 			</a-col>
+		</a-row>
+		<a-row v-if="confirmedResponse" class="margin_top_med">
+			<div>
+				<h2>Transaction Receipt</h2>
+				<div>
+					<a class="med_font_size" :href="algoExplorerURl" target="_blank"
+						>Open in Algo Explorer</a
+					>
+				</div>
+			</div>
+			<a-textarea
+				style="background-color: white !important; color: black !important"
+				:auto-size="{ maxRows: 22 }"
+				:bordered="false"
+				v-model:value="confirmedResponse"
+				:disabled="true"
+			/>
 		</a-row>
 	</a-layout-content>
 </template>
@@ -64,7 +80,7 @@ import {
 	convertObjectValuesToUnit8Array,
 	convertToBase64,
 } from "@/utilities";
-import algosdk from "algosdk";
+import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";
 import {
 	errorMessage,
 	loadingMessage,
@@ -88,12 +104,15 @@ export default defineComponent({
 			txOutput: "",
 			txInputError: "",
 			key: "SenderKey",
+			confirmedResponse: "",
+			isSendDisabled: false,
 		};
 	},
 	setup() {
 		const walletStore = WalletStore();
 		return {
 			walletStore,
+			algoExplorerURl: walletStore.algoExplorerURL,
 		};
 	},
 	methods: {
@@ -110,7 +129,8 @@ export default defineComponent({
 		formatConfirmedResponse(
 			response: algosdk.modelsv2.PendingTransactionResponse
 		) {
-			this.txOutput = formatJSON(response);
+			this.confirmedResponse = formatJSON(response);
+			this.isSendDisabled = true;
 			successMessage(this.key);
 			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
 		},
@@ -137,6 +157,17 @@ export default defineComponent({
 					);
 				} else encodedTx = convertBase64ToUnit8Array(this.txInput);
 			}
+			let txID = "";
+			if (this.isMsgPackSelected) {
+				const decodedTxn = decodeObj(
+					convertBase64ToUnit8Array(this.txInput)
+				) as EncodedSignedTransaction;
+
+				txID = algosdk.Transaction.from_obj_for_encoding(decodedTxn.txn).txID();
+			} else {
+				// TODO : ADD TxID support for json
+			}
+			this.algoExplorerURl = this.walletStore.addTxIDToUrl(txID);
 			try {
 				let response;
 				switch (this.walletStore.walletKind) {
@@ -194,12 +225,15 @@ export default defineComponent({
 						}
 					}
 				}
+				if (this.isSendDisabled && this.txOutput) {
+					this.isSendDisabled = false;
+				}
 			} else {
 				// input is removed but preview still exists
 				if (this.txOutput) {
 					this.txOutput = "";
-					this.txInputError = "";
 				}
+				this.txInputError = "";
 			}
 		},
 	},
