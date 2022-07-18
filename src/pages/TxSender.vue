@@ -2,7 +2,7 @@
 	<a-layout-content class="content_sign">
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
-				<h1>Transaction Input</h1>
+				<h2>Transaction Input</h2>
 				<a-switch
 					v-model:checked="isJsonSelected"
 					checked-children="json"
@@ -26,7 +26,7 @@
 				</div>
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
-				<h1>Transaction preview</h1>
+				<h2>Transaction preview</h2>
 				<a-textarea
 					:style="
 						txOutput.length &&
@@ -48,11 +48,11 @@
 		</a-row>
 		<a-row v-if="confirmedResponse" class="margin_top_med">
 			<div>
-				<h1>Transaction Receipt</h1>
+				<h2>Transaction Receipt</h2>
 				<div>
-					<h4>
-						<a :href="algoExplorerURl" target="_blank">Open in Algo Explorer</a>
-					</h4>
+					<a class="med_font_size" :href="algoExplorerURl" target="_blank"
+						>Open in Algo Explorer</a
+					>
 				</div>
 			</div>
 			<a-textarea

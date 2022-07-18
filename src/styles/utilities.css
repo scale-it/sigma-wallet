@@ -9,3 +9,8 @@
 .padding_med {
 	padding: 1.5rem;
 }
+
+.med_font_size {
+	font-size: 1.7rem;
+	font-weight: 500;
+}
