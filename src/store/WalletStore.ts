@@ -49,5 +49,8 @@ export default defineStore("WalletStore", {
 					break;
 			}
 		},
+		addTxIDToUrl(txID: string) {
+			return this.algoExplorerURL.concat(txID);
+		},
 	},
 });

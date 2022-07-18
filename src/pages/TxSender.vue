@@ -78,7 +78,7 @@ import {
 	convertObjectValuesToUnit8Array,
 	convertToBase64,
 } from "@/utilities";
-import algosdk from "algosdk";
+import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";
 import {
 	errorMessage,
 	loadingMessage,
@@ -129,10 +129,6 @@ export default defineComponent({
 		) {
 			this.confirmedResponse = formatJSON(response);
 			this.isSendDisabled = true;
-			const txID = algosdk.Transaction.from_obj_for_encoding(
-				response.txn.txn
-			).txID();
-			this.algoExplorerURl.concat(txID);
 			successMessage(this.key);
 			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
 		},
@@ -159,6 +155,17 @@ export default defineComponent({
 					);
 				} else encodedTx = convertBase64ToUnit8Array(this.txInput);
 			}
+			let txID = "";
+			if (!this.isJsonSelected) {
+				const decodedTxn = decodeObj(
+					convertBase64ToUnit8Array(this.txInput)
+				) as EncodedSignedTransaction;
+
+				txID = algosdk.Transaction.from_obj_for_encoding(decodedTxn.txn).txID();
+			} else {
+				// TODO : ADD TxID support for json
+			}
+			this.algoExplorerURl = this.walletStore.addTxIDToUrl(txID);
 			try {
 				let response;
 				switch (this.walletStore.walletKind) {
