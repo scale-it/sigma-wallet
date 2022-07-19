@@ -112,7 +112,7 @@ async function Execute() {
     fs.writeFileSync("BasicFinishedMultisig.txn", JSON.stringify(algosdk.decodeObj(combinedBasicMultisig), null, 4));
     
     await algodClient.sendRawTransaction(combinedBasicMultisig).do();
-    console.log("Complete!");
+    console.log("Complete!")
 }
 
 Execute();
