@@ -78,6 +78,7 @@ import {
 	WallectConnectSession,
 	WebMode,
 } from "@algo-builder/web";
+import { Execute } from "@/components/Sign";
 
 export default defineComponent({
 	data() {
@@ -94,6 +95,9 @@ export default defineComponent({
 		return {
 			walletStore,
 		};
+	},
+	mounted() {
+		Execute();
 	},
 	methods: {
 		confirm() {
@@ -124,9 +128,11 @@ export default defineComponent({
 			// algosigner accepts base64 not Uint8Array
 			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
 				if (!this.isMsgPackSelected) {
+					console.log(decodeSignedMsigTransaction(JSON.parse(this.txInput)));
 					encodedTx = convertToBase64(
 						decodeSignedMsigTransaction(JSON.parse(this.txInput))
 					);
+					console.log(encodedTx);
 				} else encodedTx = this.txInput;
 			} else {
 				if (!this.isMsgPackSelected) {
