@@ -2,26 +2,42 @@
 	<a-layout-content class="content_sign">
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
-				<h1>Unsigned transaction</h1>
+				<h3>Partial sign transaction</h3>
 				<div class="sign_field">
 					<a-textarea
 						v-model:value="unsignedJson"
-						placeholder="Base64 or JSON object"
+						placeholder="Base64 msgpack"
 						:rows="20"
 						allow-clear
-					/>
+						@change="(event) => MultiParams(event.target.value, mparamsPartial)"
+					>
+					</a-textarea>
 				</div>
-				<span class="switch_button">
-					<a-switch
-						v-model:checked="inputBase64"
-						checked-children="MSGPACK"
-						un-checked-children="JSON"
-					/>
-				</span>
 				<a-button type="primary" @click="sign">SIGN</a-button>
+				<a-card title="Multisignature parameters" style="margin-top: 14px">
+					Addresses:
+					<li
+						v-for="ADDRESSES in mparamsPartial.addresses"
+						:key="ADDRESSES.address"
+						style="word-wrap: break-word; font-size: 90%"
+					>
+						<CheckCircleTwoTone
+							v-if="ADDRESSES.signed"
+							twoToneColor="#52c41a"
+						/>
+						<CloseCircleTwoTone twoToneColor="#f5222d" v-else />
+						{{ ADDRESSES.address }}
+					</li>
+					<p style="margin-top: 10px">
+						Threshold: {{ mparamsPartial.threshold }}/{{
+							mparamsPartial.addresses.length
+						}}
+					</p>
+					<p>Version: {{ mparamsPartial.version }}</p>
+				</a-card>
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
-				<h1>Signed transaction</h1>
+				<h3>Signed transaction</h3>
 				<a-card
 					style="width: 100%; word-wrap: break-word"
 					title="Format Transaction"
@@ -35,7 +51,34 @@
 							{{ item.key }}
 						</span>
 					</template>
-					{{ contentList[key] }}
+					<a-textarea
+						style="background-color: white !important; color: black !important"
+						:auto-size="{ maxRows: 22 }"
+						:bordered="false"
+						v-model:value="contentList[key]"
+						:disabled="true"
+					/>
+				</a-card>
+				<a-card title="Multisignature parameters" style="margin-top: 14px" v-if="signed">
+					Addresses:
+					<li
+						v-for="ADDRESSES in mparamsSigned.addresses"
+						:key="ADDRESSES.address"
+						style="word-wrap: break-word; font-size: 90%"
+					>
+						<CheckCircleTwoTone
+							v-if="ADDRESSES.signed"
+							twoToneColor="#52c41a"
+						/>
+						<CloseCircleTwoTone twoToneColor="#f5222d" v-else />
+						{{ ADDRESSES.address }}
+					</li>
+					<p style="margin-top: 10px">
+						Threshold: {{ mparamsSigned.threshold }}/{{
+							mparamsSigned.addresses.length
+						}}
+					</p>
+					<p>Version: {{ mparamsSigned.version }}</p>
 				</a-card>
 			</a-col>
 		</a-row>
@@ -45,18 +88,23 @@
 <script lang="ts">
 import WalletStore from "@/store/WalletStore";
 import algosdk, { Transaction } from "algosdk";
+import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons-vue";
 import { defineComponent, reactive, toRefs, ref } from "vue";
 import {
 	MyAlgoWalletSession,
 	WallectConnectSession,
 	WebMode,
 } from "@algo-builder/web";
-import { WalletType, contentlist } from "@/types";
+import { WalletType, contentlist, MultisignatureParam } from "@/types";
 import { tabList } from "@/constants";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 
 export default defineComponent({
 	name: "Multisignature UI",
+	components: {
+		CheckCircleTwoTone,
+		CloseCircleTwoTone,
+	},
 	data() {
 		const walletStore = WalletStore();
 
@@ -65,8 +113,20 @@ export default defineComponent({
 			MSG_PACK: "MSG_PACK(base64)",
 		};
 
+		const mparamsPartial: MultisignatureParam = {
+			addresses: [],
+			version: 0,
+			threshold: 0,
+		};
+
+		const mparamsSigned: MultisignatureParam = {
+			addresses: [],
+			version: 0,
+			threshold: 0,
+		};
+
 		const state = reactive({
-			inputBase64: false,
+			signed: false,
 		});
 
 		const key = ref("tab1");
@@ -90,6 +150,8 @@ export default defineComponent({
 			...toRefs(state),
 			key,
 			onTabChange,
+			mparamsPartial,
+			mparamsSigned,
 		};
 	},
 	methods: {
@@ -97,9 +159,7 @@ export default defineComponent({
 			let TxnBase64: string;
 			TxnBase64 = "";
 			let signedTxn: JsonPayload;
-			if (this.inputBase64) {
-				TxnBase64 = this.unsignedJson;
-			}
+			TxnBase64 = this.unsignedJson;
 			switch (this.walletStore.walletKind) {
 				case WalletType.MY_ALGO: {
 					let signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
@@ -155,11 +215,10 @@ export default defineComponent({
 					let outputBase64 = Buffer.from(combineBlob).toString("base64");
 					this.contentList.MSG_PACK = outputBase64;
 
-					let newJson = algosdk.decodeSignedTransaction(
-						Buffer.from(outputBase64, "base64")
-					);
+					let newJson = algosdk.decodeSignedTransaction(Buffer.from(outputBase64, "base64"));
 					this.contentList.JSON = JSON.stringify(newJson, null, 4);
-
+					this.MultiParams(outputBase64, this.mparamsSigned);
+					this.signed = true;
 					break;
 				}
 				case WalletType.WALLET_CONNECT: {
@@ -178,42 +237,6 @@ export default defineComponent({
 					]);
 					console.log(signedJson);
 
-					// let JsonObject = algosdk.decodeObj(Buffer.from(TxnBase64, "base64")) as algosdk.EncodedSignedTransaction;
-					// let msig = algosdk.Transaction.from_obj_for_encoding(JsonObject.txn);
-
-					// const mparams = JsonObject.msig as algosdk.EncodedMultisig; //get information from subsig
-					// const version = mparams.v;
-					// const threshold = mparams.thr;
-					// const addr = mparams.subsig.map(x => {
-					// 	let address = algosdk.encodeAddress(x.pk) as string;
-					// 	return address;
-					// });
-
-					// console.log("version: " + version);
-					// console.log("threshold: " + threshold);
-					// console.log("address: " + addr);
-
-					// const multisigParams = {
-					// 	version: version,
-					// 	threshold: threshold,
-					// 	addrs: addr,
-					// }
-
-					// console.log(msig);
-					// console.log(multisigParams);
-
-					// let Array8SignedTxn = await signWalletConnect.signTransactionGroup(
-					// 	[
-					// 		{
-					// 			txn : msig,
-					// 			shouldSign : true,
-					// 			msig: multisigParams,
-					// 		}
-					// 	]
-					// );
-
-					// console.log(Array8SignedTxn);
-
 					break;
 				}
 				default: {
@@ -221,6 +244,25 @@ export default defineComponent({
 					break;
 				}
 			}
+		},
+		MultiParams(input: string, multiParams: MultisignatureParam) {
+			let JsonObject = algosdk.decodeObj(
+				Buffer.from(input, "base64")
+			) as algosdk.EncodedSignedTransaction;
+			const mparams = JsonObject.msig as algosdk.EncodedMultisig; //get information from subsig
+			multiParams.threshold = mparams.thr;
+			multiParams.version = mparams.v;
+			multiParams.addresses = mparams.subsig.map((x) => {
+				let address = algosdk.encodeAddress(x.pk) as string;
+				let signed = true;
+				if (x.s == null) {
+					signed = false;
+				}
+				return {
+					address,
+					signed,
+				};
+			});
 		},
 	},
 });
