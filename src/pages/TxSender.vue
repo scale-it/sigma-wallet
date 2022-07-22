@@ -135,12 +135,13 @@ export default defineComponent({
 			} else {
 				encodedTx = convertBase64ToUnit8Array(this.txInput);
 			}
-			let txID = "";
 			const decodedTxn = decodeObj(
 				convertBase64ToUnit8Array(this.txInput)
 			) as EncodedSignedTransaction;
 
-			txID = algosdk.Transaction.from_obj_for_encoding(decodedTxn.txn).txID();
+			const txID = algosdk.Transaction.from_obj_for_encoding(
+				decodedTxn.txn
+			).txID();
 			this.algoExplorerURl = this.walletStore.addTxIDToUrl(txID);
 			try {
 				let response;
