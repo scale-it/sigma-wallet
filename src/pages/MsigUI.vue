@@ -59,7 +59,11 @@
 						:disabled="true"
 					/>
 				</a-card>
-				<a-card title="Multisignature parameters" style="margin-top: 14px" v-if="signed">
+				<a-card
+					title="Multisignature parameters"
+					style="margin-top: 14px"
+					v-if="signed"
+				>
 					Addresses:
 					<li
 						v-for="ADDRESSES in mparamsSigned.addresses"
@@ -215,7 +219,9 @@ export default defineComponent({
 					let outputBase64 = Buffer.from(combineBlob).toString("base64");
 					this.contentList.MSG_PACK = outputBase64;
 
-					let newJson = algosdk.decodeSignedTransaction(Buffer.from(outputBase64, "base64"));
+					let newJson = algosdk.decodeSignedTransaction(
+						Buffer.from(outputBase64, "base64")
+					);
 					this.contentList.JSON = JSON.stringify(newJson, null, 4);
 					this.MultiParams(outputBase64, this.mparamsSigned);
 					this.signed = true;
