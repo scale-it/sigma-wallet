@@ -79,7 +79,7 @@ import {
 	formatJSON,
 	convertObjectValuesToUnit8Array,
 	convertToBase64,
-	prettifyJSON,
+	prettifyTransaction,
 } from "@/utilities";
 import algosdk, {
 	decodeObj,
@@ -139,7 +139,7 @@ export default defineComponent({
 				this.confirmedResponse = formatJSON(response);
 			} else {
 				let formattedJSON: any = response;
-				formattedJSON.txn = prettifyJSON(response.txn);
+				formattedJSON.txn = prettifyTransaction(response.txn);
 				this.confirmedResponse = formatJSON(formattedJSON);
 			}
 			this.isSendDisabled = true;
@@ -231,7 +231,7 @@ export default defineComponent({
 								convertBase64ToUnit8Array(this.txInput)
 							);
 							// decode msgpack to unit8Array
-							this.txOutput = formatJSON(prettifyJSON(transaction));
+							this.txOutput = formatJSON(prettifyTransaction(transaction));
 						} catch (error) {
 							this.txInputError = error.message;
 						}

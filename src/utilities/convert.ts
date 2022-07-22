@@ -19,12 +19,12 @@ export function convertToBase64(input: any): string {
 	return Buffer.from(input).toString("base64");
 }
 
-export function prettifyJSON(
-	transaction: SignedTransaction | EncodedSignedTransaction
+export function prettifyTransaction(
+	tx: SignedTransaction | EncodedSignedTransaction
 ) {
 	// need to set any type else there are multiple type errors since we are formatting the JSON unsimilar to any prescribed Transaction type
-	const formatTransaction: any = transaction;
-	let txn: any = transaction.txn;
+	const formatTransaction: any = Object.assign({}, tx);
+	let txn: any = tx.txn;
 	// that means the transaction is SignedTransaction
 	if (typeof formatTransaction.txn.get_obj_for_encoding === "function") {
 		txn = formatTransaction.txn.get_obj_for_encoding();
@@ -53,5 +53,5 @@ export function prettifyJSON(
 	}
 	formatTransaction.msig.subsig = subsig;
 	formatTransaction.txn = txn;
-	return transaction;
+	return formatTransaction;
 }
