@@ -67,13 +67,7 @@ import { defineComponent, createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import WalletStore from "@/store/WalletStore";
-import {
-	isJson,
-	convertBase64ToUnit8Array,
-	formatJSON,
-	convertObjectValuesToUnit8Array,
-	convertToBase64,
-} from "@/utilities";
+import { convertBase64ToUnit8Array, formatJSON } from "@/utilities";
 import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";
 import {
 	errorMessage,
