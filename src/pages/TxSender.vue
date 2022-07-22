@@ -79,6 +79,7 @@ import {
 	formatJSON,
 	convertObjectValuesToUnit8Array,
 	convertToBase64,
+	prettifyJSON,
 } from "@/utilities";
 import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";
 import {
@@ -216,10 +217,11 @@ export default defineComponent({
 					if (this.txInput) {
 						try {
 							// decode msgpack to unit8Array
-							const decodedTx = algosdk.decodeSignedTransaction(
-								convertBase64ToUnit8Array(this.txInput)
+							this.txOutput = JSON.stringify(
+								prettifyJSON(this.txInput),
+								null,
+								4
 							);
-							this.txOutput = JSON.stringify(decodedTx, null, 4);
 						} catch (error) {
 							this.txInputError = error.message;
 						}
