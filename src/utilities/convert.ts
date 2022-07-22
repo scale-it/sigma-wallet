@@ -1,5 +1,8 @@
-import { decodeSignedTransaction } from "algosdk";
-
+import {
+	encodeAddress,
+	EncodedSignedTransaction,
+	SignedTransaction,
+} from "algosdk";
 export function convertBase64ToUnit8Array(input: string): Uint8Array {
 	return Uint8Array.from(Buffer.from(input, "base64"));
 }
@@ -16,26 +19,39 @@ export function convertToBase64(input: any): string {
 	return Buffer.from(input).toString("base64");
 }
 
-export function prettifyJSON(input: string) {
-	const transaction = decodeSignedTransaction(convertBase64ToUnit8Array(input));
-	const txn = transaction.txn.get_obj_for_encoding();
-	const subsig = transaction.msig?.subsig;
+export function prettifyJSON(
+	transaction: SignedTransaction | EncodedSignedTransaction
+) {
+	// need to set any type else there are multiple type errors since we are formatting the JSON unsimilar to any prescribed Transaction type
+	const formatTransaction: any = transaction;
+	let txn: any = transaction.txn;
+	// that means the transaction is SignedTransaction
+	if (typeof formatTransaction.txn.get_obj_for_encoding === "function") {
+		txn = formatTransaction.txn.get_obj_for_encoding();
+	}
 
+	let subsig = formatTransaction.msig?.subsig;
+	// encoding the uint8Array values to base64
 	for (const key in txn) {
 		if (ArrayBuffer.isView(txn[key])) {
-			txn[key] = convertToBase64(txn[key]);
+			if (key === "rcv" || key === "snd") {
+				txn[key] = encodeAddress(txn[key]);
+			} else {
+				txn[key] = convertToBase64(txn[key]);
+			}
 		}
 	}
+
 	if (subsig) {
-		for (const sig of subsig) {
-			if (sig.pk) {
-				sig.pk = convertToBase64(sig.pk);
-			}
+		subsig = subsig.map((sig: any) => {
+			sig.pk = encodeAddress(sig.pk);
 			if (sig.s) {
 				sig.s = convertToBase64(sig.s);
 			}
-		}
+			return sig;
+		});
 	}
-	transaction.txn = txn;
+	formatTransaction.msig.subsig = subsig;
+	formatTransaction.txn = txn;
 	return transaction;
 }

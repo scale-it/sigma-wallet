@@ -81,7 +81,11 @@ import {
 	convertToBase64,
 	prettifyJSON,
 } from "@/utilities";
-import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";
+import algosdk, {
+	decodeObj,
+	decodeSignedTransaction,
+	EncodedSignedTransaction,
+} from "algosdk";
 import {
 	errorMessage,
 	loadingMessage,
@@ -130,7 +134,14 @@ export default defineComponent({
 		formatConfirmedResponse(
 			response: algosdk.modelsv2.PendingTransactionResponse
 		) {
-			this.confirmedResponse = formatJSON(response);
+			// for MyAlgo wallet and Wallet Connect the transaction is not formatted like in Algosigner
+			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
+				this.confirmedResponse = formatJSON(response);
+			} else {
+				let formattedJSON: any = response;
+				formattedJSON.txn = prettifyJSON(response.txn);
+				this.confirmedResponse = formatJSON(formattedJSON);
+			}
 			this.isSendDisabled = true;
 			successMessage(this.key);
 			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
@@ -216,12 +227,11 @@ export default defineComponent({
 					this.txInputError = "";
 					if (this.txInput) {
 						try {
-							// decode msgpack to unit8Array
-							this.txOutput = JSON.stringify(
-								prettifyJSON(this.txInput),
-								null,
-								4
+							const transaction = decodeSignedTransaction(
+								convertBase64ToUnit8Array(this.txInput)
 							);
+							// decode msgpack to unit8Array
+							this.txOutput = formatJSON(prettifyJSON(transaction));
 						} catch (error) {
 							this.txInputError = error.message;
 						}
