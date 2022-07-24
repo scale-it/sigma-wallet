@@ -32,6 +32,8 @@ export function prettifyTransaction(
 		if (ArrayBuffer.isView(txn[key])) {
 			if (key === "rcv" || key === "snd") {
 				txn[key] = encodeAddress(txn[key]);
+			} else if (key === "note") {
+				txn[key] = JSON.parse(new TextDecoder().decode(txn[key]));
 			} else {
 				txn[key] = convertToBase64(txn[key]);
 			}
