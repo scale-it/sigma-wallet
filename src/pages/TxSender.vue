@@ -67,7 +67,11 @@ import { defineComponent, createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import WalletStore from "@/store/WalletStore";
-import { convertBase64ToUnit8Array, formatJSON } from "@/utilities";
+import {
+	convertBase64ToUnit8Array,
+	formatJSON,
+	prettifyTransaction,
+} from "@/utilities";
 import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";
 import {
 	errorMessage,
@@ -116,7 +120,14 @@ export default defineComponent({
 		formatConfirmedResponse(
 			response: algosdk.modelsv2.PendingTransactionResponse
 		) {
-			this.confirmedResponse = formatJSON(response);
+			// for MyAlgo wallet and Wallet Connect the transaction is not formatted like in Algosigner
+			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
+				this.confirmedResponse = formatJSON(response);
+			} else {
+				let formattedJSON: any = response;
+				formattedJSON.txn = prettifyTransaction(response.txn);
+				this.confirmedResponse = formatJSON(formattedJSON);
+			}
 			this.isSendDisabled = true;
 			successMessage(this.key);
 			openSuccessNotificationWithIcon(TRANSACTION_SEND_SUCCESSFUL);
@@ -182,7 +193,7 @@ export default defineComponent({
 					const decodedTx = algosdk.decodeSignedTransaction(
 						convertBase64ToUnit8Array(this.txInput)
 					);
-					this.txOutput = JSON.stringify(decodedTx, null, 4);
+					this.txOutput = formatJSON(prettifyTransaction(decodedTx));
 				} catch (error) {
 					this.txInputError = error.message;
 				}
