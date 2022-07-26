@@ -1,5 +1,5 @@
 <template>
-	<div class="margin_top">
+	<div class="margin_top_med">
 		<a-card title="Multisignature parameters">
 			Addresses:
 			<li
@@ -11,7 +11,7 @@
 				<CloseCircleTwoTone twoToneColor="red" v-else />
 				{{ ADDRESSES.address }}
 			</li>
-			<p class="margin_top">
+			<p class="margin_top_med">
 				Threshold: {{ mparams.threshold }}/{{ mparams.addresses.length }}
 			</p>
 			<p>Version: {{ mparams.version }}</p>
