@@ -1,20 +1,22 @@
 <template>
-	<a-card title="Multisignature parameters" style="margin-top: 14px">
-		Addresses:
-		<li
-			v-for="ADDRESSES in mparams.addresses"
-			:key="ADDRESSES.address"
-			class="list_addresses"
-		>
-			<CheckCircleTwoTone v-if="ADDRESSES.signed" twoToneColor="LightGreen" />
-			<CloseCircleTwoTone twoToneColor="red" v-else />
-			{{ ADDRESSES.address }}
-		</li>
-		<p style="margin-top: 10px">
-			Threshold: {{ mparams.threshold }}/{{ mparams.addresses.length }}
-		</p>
-		<p>Version: {{ mparams.version }}</p>
-	</a-card>
+	<div class="margin_top">
+		<a-card title="Multisignature parameters">
+			Addresses:
+			<li
+				v-for="ADDRESSES in mparams.addresses"
+				:key="ADDRESSES.address"
+				class="list_addresses"
+			>
+				<CheckCircleTwoTone v-if="ADDRESSES.signed" twoToneColor="LightGreen" />
+				<CloseCircleTwoTone twoToneColor="red" v-else />
+				{{ ADDRESSES.address }}
+			</li>
+			<p class="margin_top">
+				Threshold: {{ mparams.threshold }}/{{ mparams.addresses.length }}
+			</p>
+			<p>Version: {{ mparams.version }}</p>
+		</a-card>
+	</div>
 </template>
 
 <script lang="ts">
