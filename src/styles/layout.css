@@ -11,3 +11,8 @@
 .header {
 	display: flex;
 }
+
+.card {
+	width: 100%;
+	word-wrap: break-word;
+}

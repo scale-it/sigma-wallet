@@ -18,7 +18,7 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
 				<h3>Signed transaction</h3>
 				<a-card
-					style="width: 100%; word-wrap: break-word"
+					class="card"
 					title="Format Transaction"
 					:tab-list="tabList"
 					:active-tab-key="key"
@@ -57,6 +57,12 @@ import { WalletType, contentlist } from "@/types";
 import { tabList } from "@/constants";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import MultisigParameters from "@/components/multisigParameters.vue";
+import {
+	convertBase64ToUnit8Array,
+	formatJSON,
+	prettifyTransaction,
+	convertToBase64,
+} from "@/utilities";
 
 export default defineComponent({
 	name: "Multisignature UI",
@@ -107,10 +113,10 @@ export default defineComponent({
 				case WalletType.MY_ALGO: {
 					let signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
 
-					let Trxs = algosdk.decodeUnsignedTransaction(
-						Buffer.from(TxnBase64, "base64")
+					let trxs = algosdk.decodeUnsignedTransaction(
+						convertBase64ToUnit8Array(TxnBase64)
 					);
-					let tmpSign = await signMyAlgo.signTransaction(Trxs);
+					let tmpSign = await signMyAlgo.signTransaction(trxs);
 					console.log(tmpSign);
 
 					break;
@@ -118,14 +124,11 @@ export default defineComponent({
 				case WalletType.ALGOSIGNER: {
 					let signAlgoSigner = this.walletStore.webMode as WebMode;
 					let jsonObject = algosdk.decodeObj(
-						Buffer.from(TxnBase64, "base64")
+						convertBase64ToUnit8Array(TxnBase64)
 					) as algosdk.EncodedSignedTransaction;
 					let msig = algosdk.Transaction.from_obj_for_encoding(jsonObject.txn);
 					const bytes = algosdk.encodeObj(msig.get_obj_for_encoding());
-					console.log(
-						"Base64 transaction: " + Buffer.from(bytes).toString("base64")
-					);
-					const txnBase64Signing = Buffer.from(bytes).toString("base64"); // base64 of the transaction without signature
+					const txnBase64Signing = convertToBase64(bytes); // base64 of the transaction without signature
 					const mparams = jsonObject.msig as algosdk.EncodedMultisig; //get information from subsig
 					const version = mparams.v;
 					const threshold = mparams.thr;
@@ -149,17 +152,15 @@ export default defineComponent({
 					const json = signedTxn[0] as JsonPayload;
 					const blob = json.blob as string;
 
-					const blob1 = Uint8Array.from(Buffer.from(TxnBase64, "base64"));
-					const blob2 = Uint8Array.from(Buffer.from(blob, "base64"));
+					const blob1 = convertBase64ToUnit8Array(TxnBase64);
+					const blob2 = convertBase64ToUnit8Array(blob);
 					const combineBlob = algosdk.mergeMultisigTransactions([blob1, blob2]);
 
-					const outputBase64 = Buffer.from(combineBlob).toString("base64");
+					const outputBase64 = convertToBase64(combineBlob);
 					this.contentList.MSG_PACK = outputBase64;
 
-					const newJson = algosdk.decodeSignedTransaction(
-						Buffer.from(outputBase64, "base64")
-					);
-					this.contentList.JSON = JSON.stringify(newJson, null, 4);
+					const newJson = algosdk.decodeSignedTransaction(combineBlob);
+					this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
 					this.signed = true;
 					break;
 				}
@@ -168,7 +169,7 @@ export default defineComponent({
 						.webMode as WallectConnectSession;
 
 					let trxs = algosdk.decodeUnsignedTransaction(
-						Buffer.from(TxnBase64, "base64")
+						convertBase64ToUnit8Array(TxnBase64)
 					);
 					console.log(trxs);
 					let signedJson = await signWalletConnect.signTransactionGroup([
