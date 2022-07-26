@@ -9,3 +9,8 @@
 .padding_med {
 	padding: 1.5rem;
 }
+
+.list_addresses {
+	word-wrap: break-word;
+	font-size: 90%;
+}
