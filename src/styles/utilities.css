@@ -5,3 +5,8 @@
 .margin_top_med {
 	margin-top: 1.5rem;
 }
+
+.list_addresses {
+	word-wrap: break-word;
+	font-size: 90%;
+}
