@@ -21,6 +21,7 @@
 
 <script lang="ts">
 import { MultisignatureParam } from "@/types";
+import { convertBase64ToUnit8Array } from "@/utilities";
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons-vue/";
 import algosdk from "algosdk";
 import { defineComponent } from "vue";
@@ -45,10 +46,10 @@ export default defineComponent({
 		};
 	},
 	methods: {
-		MultiParams() {
+		multiParams() {
 			this.input = this.inputBase64;
 			let jsonObject = algosdk.decodeObj(
-				Buffer.from(this.input, "base64")
+				convertBase64ToUnit8Array(this.input)
 			) as algosdk.EncodedSignedTransaction;
 			const mparams = jsonObject.msig as algosdk.EncodedMultisig; //get information from subsig
 			this.mparams.threshold = mparams.thr;
@@ -65,7 +66,7 @@ export default defineComponent({
 	},
 	watch: {
 		inputBase64() {
-			this.MultiParams();
+			this.multiParams();
 		},
 	},
 });

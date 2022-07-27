@@ -31,10 +31,7 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
 				<h1>Transaction preview</h1>
 				<a-textarea
-					:style="
-						txOutput.length &&
-						'background-color: white !important; color: black !important'
-					"
+					class="text_area"
 					:auto-size="{ maxRows: 22 }"
 					:bordered="false"
 					v-model:value="txOutput"
@@ -61,7 +58,7 @@ import {
 	isJson,
 	convertBase64ToUnit8Array,
 	formatJSON,
-	convertObjectValuesToUnit8Array,
+
 	convertToBase64,
 } from "@/utilities";
 import algosdk from "algosdk";
