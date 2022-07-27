@@ -117,7 +117,7 @@ export default defineComponent({
 						convertBase64ToUnit8Array(txnBase64)
 					);
 					let tmpSign = await signMyAlgo.signTransaction(trxs);
-					
+
 					break;
 				}
 				case WalletType.ALGOSIGNER: {
@@ -176,7 +176,7 @@ export default defineComponent({
 							shouldSign: true,
 						},
 					]);
-					
+
 					break;
 				}
 				default: {
