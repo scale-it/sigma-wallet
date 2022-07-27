@@ -5,4 +5,5 @@ export interface WalletStoreState {
 	webMode: WebModeTypes;
 	address: string;
 	network: NetworkTypes;
+	algoExplorerURL: string;
 }
