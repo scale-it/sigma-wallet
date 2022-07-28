@@ -24,10 +24,8 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
 				<h2>Transaction preview</h2>
 				<a-textarea
-					:style="
-						txOutput.length &&
-						'background-color: white !important; color: black !important'
-					"
+					class="text_area"
+					:style="txOutput.length"
 					:auto-size="{ maxRows: 22 }"
 					:bordered="false"
 					v-model:value="txOutput"
@@ -52,7 +50,7 @@
 				</div>
 			</div>
 			<a-textarea
-				style="background-color: white !important; color: black !important"
+				class="text_area"
 				:auto-size="{ maxRows: 22 }"
 				:bordered="false"
 				v-model:value="confirmedResponse"
@@ -70,6 +68,7 @@ import WalletStore from "@/store/WalletStore";
 import {
 	convertBase64ToUnit8Array,
 	formatJSON,
+	convertToBase64,
 	prettifyTransaction,
 } from "@/utilities";
 import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";

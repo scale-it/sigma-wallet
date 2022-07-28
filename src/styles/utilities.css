@@ -10,6 +10,11 @@
 	padding: 1.5rem;
 }
 
+.list_addresses {
+	word-wrap: break-word;
+	font-size: 90%;
+}
+
 .med_font_size {
 	font-size: 1.7rem;
 	font-weight: 500;

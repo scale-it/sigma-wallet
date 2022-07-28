@@ -11,3 +11,13 @@
 .header {
 	display: flex;
 }
+
+.card {
+	width: 100%;
+	word-wrap: break-word;
+}
+
+.text_area {
+	background-color: white !important;
+	color: black !important;
+}
