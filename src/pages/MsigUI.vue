@@ -102,7 +102,6 @@ export default defineComponent({
 			...toRefs(state),
 			key,
 			onTabChange,
-			signMyAlgo:null,
 		};
 	},
 	methods: {
@@ -112,12 +111,12 @@ export default defineComponent({
 			txnBase64 = this.unsignedJson;
 			switch (this.walletStore.walletKind) {
 				case WalletType.MY_ALGO: {
-					this.signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
+					let signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
 
 					let trxs = algosdk.decodeUnsignedTransaction(
 						convertBase64ToUnit8Array(txnBase64)
 					);
-					let tmpSign = await this.signMyAlgo.signTransaction(trxs);
+					let tmpSign = await signMyAlgo.signTransaction(trxs);
 					console.log(tmpSign);
 
 					break;
