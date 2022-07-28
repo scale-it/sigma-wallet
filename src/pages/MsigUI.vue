@@ -47,7 +47,7 @@
 <script lang="ts">
 import WalletStore from "@/store/WalletStore";
 import algosdk, { Transaction } from "algosdk";
-import { defineComponent, reactive, toRefs, ref } from "vue";
+import { defineComponent, reactive, toRefs, ref, shallowRef } from "vue";
 import {
 	MyAlgoWalletSession,
 	WallectConnectSession,
@@ -102,6 +102,7 @@ export default defineComponent({
 			...toRefs(state),
 			key,
 			onTabChange,
+			signMyAlgo:null,
 		};
 	},
 	methods: {
@@ -111,12 +112,13 @@ export default defineComponent({
 			txnBase64 = this.unsignedJson;
 			switch (this.walletStore.walletKind) {
 				case WalletType.MY_ALGO: {
-					let signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
+					this.signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
 
 					let trxs = algosdk.decodeUnsignedTransaction(
 						convertBase64ToUnit8Array(txnBase64)
 					);
-					let tmpSign = await signMyAlgo.signTransaction(trxs);
+					let tmpSign = await this.signMyAlgo.signTransaction(trxs);
+					console.log(tmpSign);
 
 					break;
 				}

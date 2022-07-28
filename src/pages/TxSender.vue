@@ -25,6 +25,7 @@
 				<h2>Transaction preview</h2>
 				<a-textarea
 					class="text_area"
+					:style="txOutput.length"
 					:auto-size="{ maxRows: 22 }"
 					:bordered="false"
 					v-model:value="txOutput"
@@ -49,7 +50,7 @@
 				</div>
 			</div>
 			<a-textarea
-				style="background-color: white !important; color: black !important"
+				class="text_area"
 				:auto-size="{ maxRows: 22 }"
 				:bordered="false"
 				v-model:value="confirmedResponse"
