@@ -13,6 +13,7 @@
 .list_addresses {
 	word-wrap: break-word;
 	font-size: 90%;
+	margin-top: 1rem;
 }
 
 .med_font_size {

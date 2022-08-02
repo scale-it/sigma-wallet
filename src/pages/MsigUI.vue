@@ -16,7 +16,7 @@
 				<MultisigParameters :inputBase64="unsignedJson" />
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
-				<h3>Signed transaction</h3>
+				<h3>Transaction preview</h3>
 				<a-card
 					class="card"
 					title="Format Transaction"

@@ -22,3 +22,6 @@ export const errorMessage = (key: string) => {
 };
 
 export const UNSUCCESSFUL = "Unsuccessful";
+export const wrongAddress = "Wrong multisigature parameters!";
+export const wrongAddressDes =
+	"Address generate from multisignature parameters is not equal to the sender of the transaction";

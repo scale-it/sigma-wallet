@@ -21,4 +21,5 @@ export enum formatTypes {
 export enum Tabs {
 	Msig,
 	TxSender,
+	InitMsig,
 }
