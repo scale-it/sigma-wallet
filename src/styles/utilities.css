@@ -14,6 +14,7 @@
 	word-wrap: break-word;
 	font-size: 90%;
 	margin-top: 1rem;
+	word-break: break-all;
 }
 
 .med_font_size {

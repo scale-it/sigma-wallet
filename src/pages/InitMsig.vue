@@ -15,29 +15,38 @@
 				<div class="margin_top_med">
 					<a-card title="Multisignature parameters">
 						Addresses:
-						<li v-for="li in addresses" :key="li.id" class="list_addresses">
-							<span
-								contenteditable="true"
-								v-on:keydown.enter="updateAddress(li, $event)"
-								v-on:blur="updateAddress(li, $event)"
-							>
-								{{ li.address }}
-							</span>
-							<a-button
-								@click="removeAddress(li)"
-								type="primary"
-								danger
-								shape="circle"
-								size="small"
-								>-</a-button
-							>
-						</li>
+						<a-list size="small" :data-source="addresses">
+							<template #renderItem="{ item }">
+								<a-list-item>
+									<div
+										class="list_addresses"
+										contenteditable="true"
+										v-on:keydown.enter="updateAddress(item, $event)"
+										v-on:blur="updateAddress(item, $event)"
+									>
+										{{ item.address }}
+									</div>
+									<template #actions>
+										<a-button
+											@click="removeAddress(item)"
+											type="primary"
+											danger
+											shape="circle"
+											size="small"
+											><DeleteOutlined
+										/></a-button>
+									</template>
+								</a-list-item>
+							</template>
+						</a-list>
 
 						<li class="list_addresses">
-							<a-input v-model:value="newAddress" style="width: 90%"> </a-input>
-							<a-button type="primary" shape="circle" @click="addAddress"
-								>+</a-button
-							>
+							<a-input-search
+								v-model:value="newAddress"
+								placeholder="Input address"
+								enter-button="+"
+								@search="addAddress"
+							/>
 						</li>
 						<p class="margin_top_med">
 							Threshold:
@@ -107,6 +116,7 @@ import { WebMode, WallectConnectSession } from "@algo-builder/web";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import algosdk from "algosdk";
 import WalletStore from "@/store/WalletStore";
+import { DeleteOutlined } from "@ant-design/icons-vue";
 
 let id = 0;
 
@@ -114,6 +124,7 @@ export default defineComponent({
 	name: "Init multisignature transaction UI",
 	components: {
 		MultisigParameters,
+		DeleteOutlined,
 	},
 	data() {
 		const addresses: listAddresses[] = [];
