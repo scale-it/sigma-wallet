@@ -1,7 +1,7 @@
 <template>
 	<a-layout-content class="content_sign">
 		<a-row>
-			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
+			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Unsigned transaction</h3>
 				<div class="sign_field">
 					<a-textarea
@@ -29,10 +29,11 @@
 									<template #actions>
 										<a-button
 											@click="removeAddress(item)"
-											type="primary"
+											type="link"
 											danger
 											shape="circle"
 											size="small"
+											ghost
 											><DeleteOutlined
 										/></a-button>
 									</template>
@@ -68,7 +69,7 @@
 					>SIGN</a-button
 				>
 			</a-col>
-			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
+			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
 				<a-card
 					class="card"

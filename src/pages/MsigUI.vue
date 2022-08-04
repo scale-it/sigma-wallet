@@ -1,7 +1,7 @@
 <template>
 	<a-layout-content class="content_sign">
 		<a-row>
-			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
+			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Partial sign transaction</h3>
 				<div class="sign_field">
 					<a-textarea
@@ -15,7 +15,7 @@
 				<a-button type="primary" @click="sign">SIGN</a-button>
 				<MultisigParameters :inputBase64="unsignedJson" />
 			</a-col>
-			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
+			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
 				<a-card
 					class="card"
@@ -54,7 +54,7 @@ import {
 	WebMode,
 } from "@algo-builder/web";
 import { WalletType, contentlist } from "@/types";
-import { tabList } from "@/constants";
+import { errorMessage, openErrorNotificationWithIcon, tabList } from "@/constants";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
@@ -105,6 +105,11 @@ export default defineComponent({
 		};
 	},
 	methods: {
+
+		displayError(error: Error) {
+			errorMessage(this.key);
+			openErrorNotificationWithIcon(error.message);
+		},
 		async sign() {
 			let txnBase64 = "";
 			let signedTxn: JsonPayload;
