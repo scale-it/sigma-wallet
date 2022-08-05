@@ -20,7 +20,7 @@
 								@click="copy(item.address)"
 							>
 								<template #icon>
-									<CopyOutlined />
+									<IconWithToolTip :data="'Copy'" :icon="'Copy'" />
 								</template>
 							</a-button>
 						</template>
@@ -29,7 +29,7 @@
 			</a-list>
 			<div class="margin_top_med">
 				<div v-if="mparams.addresses.length != 0">
-					Threshold
+					Threshold : {{ mparams.threshold }}/{{ mparams.addresses.length }}
 					<InfoToolTip
 						:data="
 							mparams.threshold +
@@ -37,13 +37,15 @@
 							mparams.addresses.length +
 							' signatures are required to approve the transaction'
 						"
-					/>: {{ mparams.threshold }}/{{ mparams.addresses.length }}
+						class="margin_left_sm"
+					/>
 				</div>
 				<div v-else>
-					Threshold
+					Threshold : {{ mparams.threshold }}/{{ mparams.addresses.length }}
 					<InfoToolTip
 						:data="'Number of signature required to approve the transaction'"
-					/>: {{ mparams.threshold }}/{{ mparams.addresses.length }}
+						class="margin_left_sm"
+					/>
 				</div>
 			</div>
 
@@ -58,7 +60,6 @@ import { convertBase64ToUnit8Array, copyToClipboard } from "@/utilities";
 import {
 	CheckCircleOutlined,
 	CloseCircleOutlined,
-	CopyOutlined,
 } from "@ant-design/icons-vue/";
 import algosdk from "algosdk";
 import { defineComponent } from "vue";
@@ -68,6 +69,7 @@ import {
 	successCopyAddress,
 } from "@/constants";
 import InfoToolTip from "@/components/InfoToolTip.vue";
+import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
 
 export default defineComponent({
 	name: "Multiparameters-box",
@@ -75,8 +77,8 @@ export default defineComponent({
 	components: {
 		CloseCircleOutlined,
 		CheckCircleOutlined,
-		CopyOutlined,
 		InfoToolTip,
+		IconWithToolTip,
 	},
 	data() {
 		const mparams: MultisignatureParam = {
@@ -111,7 +113,7 @@ export default defineComponent({
 			});
 		},
 		getTruncatedAddress(addr: string) {
-			return addr.substring(0, 15) + "..." + addr.slice(-15);
+			return addr.substring(0, 13) + "..." + addr.slice(-13);
 		},
 		copy(address: string) {
 			copyToClipboard(address);

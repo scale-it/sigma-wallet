@@ -22,7 +22,7 @@ export const successMessage = (key: string) => {
 
 export const successCopyAddress = (address: string) => {
 	message.success("Address [" + address + "] copied!");
-}
+};
 
 export const TRANSACTION_SEND_SUCCESSFUL =
 	"Your Transaction is sent successfully";

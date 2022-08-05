@@ -54,7 +54,11 @@ import {
 	WebMode,
 } from "@algo-builder/web";
 import { WalletType, contentlist } from "@/types";
-import { errorMessage, openErrorNotificationWithIcon, tabList } from "@/constants";
+import {
+	errorMessage,
+	openErrorNotificationWithIcon,
+	tabList,
+} from "@/constants";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
@@ -105,7 +109,6 @@ export default defineComponent({
 		};
 	},
 	methods: {
-
 		displayError(error: Error) {
 			errorMessage(this.key);
 			openErrorNotificationWithIcon(error.message);
@@ -114,81 +117,99 @@ export default defineComponent({
 			let txnBase64 = "";
 			let signedTxn: JsonPayload;
 			txnBase64 = this.unsignedJson;
-			switch (this.walletStore.walletKind) {
-				case WalletType.MY_ALGO: {
-					let signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
 
-					let trxs = algosdk.decodeUnsignedTransaction(
-						convertBase64ToUnit8Array(txnBase64)
-					);
-					let tmpSign = await signMyAlgo.signTransaction(trxs);
-					console.log(tmpSign);
+			try {
+				switch (this.walletStore.walletKind) {
+					case WalletType.MY_ALGO: {
+						let signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
 
-					break;
+						let trxs = algosdk.decodeUnsignedTransaction(
+							convertBase64ToUnit8Array(txnBase64)
+						);
+						let tmpSign = await signMyAlgo.signTransaction(trxs);
+						console.log(tmpSign);
+
+						break;
+					}
+					case WalletType.ALGOSIGNER: {
+						let signAlgoSigner = this.walletStore.webMode as WebMode;
+						let jsonObject = algosdk.decodeObj(
+							convertBase64ToUnit8Array(txnBase64)
+						) as algosdk.EncodedSignedTransaction;
+						if (jsonObject.txn === undefined) {
+							openErrorNotificationWithIcon(
+								"Input transaction must be multisigature transaction signed at least 1 signature"
+							);
+							break;
+						}
+						let msig = algosdk.Transaction.from_obj_for_encoding(
+							jsonObject.txn
+						);
+						const bytes = algosdk.encodeObj(msig.get_obj_for_encoding());
+						const txnBase64Signing = convertToBase64(bytes); // base64 of the transaction without signature
+						const mparams = jsonObject.msig as algosdk.EncodedMultisig; // get information from subsig
+
+						const version = mparams.v;
+						const threshold = mparams.thr;
+						const addr = mparams.subsig.map((signData) => {
+							let address = algosdk.encodeAddress(signData.pk) as string;
+							return address;
+						});
+
+						const multisigParams = {
+							version: version,
+							threshold: threshold,
+							addrs: addr,
+						};
+
+						signedTxn = await signAlgoSigner.signTransaction([
+							{
+								txn: txnBase64Signing,
+								msig: multisigParams,
+							},
+						]);
+						const json = signedTxn[0] as JsonPayload;
+						const blob = json.blob as string;
+
+						const blob1 = convertBase64ToUnit8Array(txnBase64);
+						const blob2 = convertBase64ToUnit8Array(blob);
+						const combineBlob = algosdk.mergeMultisigTransactions([
+							blob1,
+							blob2,
+						]);
+
+						const outputBase64 = convertToBase64(combineBlob);
+						this.contentList.MSG_PACK = outputBase64;
+
+						const newJson = algosdk.decodeSignedTransaction(combineBlob);
+						this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
+						this.signed = true;
+						break;
+					}
+					case WalletType.WALLET_CONNECT: {
+						let signWalletConnect = this.walletStore
+							.webMode as WallectConnectSession;
+
+						let trxs = algosdk.decodeUnsignedTransaction(
+							convertBase64ToUnit8Array(txnBase64)
+						);
+						let signedJson = await signWalletConnect.signTransactionGroup([
+							{
+								txn: trxs,
+								shouldSign: true,
+							},
+						]);
+
+						break;
+					}
+					default: {
+						console.log("Invalid wallet type connected");
+						break;
+					}
 				}
-				case WalletType.ALGOSIGNER: {
-					let signAlgoSigner = this.walletStore.webMode as WebMode;
-					let jsonObject = algosdk.decodeObj(
-						convertBase64ToUnit8Array(txnBase64)
-					) as algosdk.EncodedSignedTransaction;
-					let msig = algosdk.Transaction.from_obj_for_encoding(jsonObject.txn);
-					const bytes = algosdk.encodeObj(msig.get_obj_for_encoding());
-					const txnBase64Signing = convertToBase64(bytes); // base64 of the transaction without signature
-					const mparams = jsonObject.msig as algosdk.EncodedMultisig; // get information from subsig
-					const version = mparams.v;
-					const threshold = mparams.thr;
-					const addr = mparams.subsig.map((signData) => {
-						let address = algosdk.encodeAddress(signData.pk) as string;
-						return address;
-					});
-
-					const multisigParams = {
-						version: version,
-						threshold: threshold,
-						addrs: addr,
-					};
-
-					signedTxn = await signAlgoSigner.signTransaction([
-						{
-							txn: txnBase64Signing,
-							msig: multisigParams,
-						},
-					]);
-					const json = signedTxn[0] as JsonPayload;
-					const blob = json.blob as string;
-
-					const blob1 = convertBase64ToUnit8Array(txnBase64);
-					const blob2 = convertBase64ToUnit8Array(blob);
-					const combineBlob = algosdk.mergeMultisigTransactions([blob1, blob2]);
-
-					const outputBase64 = convertToBase64(combineBlob);
-					this.contentList.MSG_PACK = outputBase64;
-
-					const newJson = algosdk.decodeSignedTransaction(combineBlob);
-					this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
-					this.signed = true;
-					break;
-				}
-				case WalletType.WALLET_CONNECT: {
-					let signWalletConnect = this.walletStore
-						.webMode as WallectConnectSession;
-
-					let trxs = algosdk.decodeUnsignedTransaction(
-						convertBase64ToUnit8Array(txnBase64)
-					);
-					let signedJson = await signWalletConnect.signTransactionGroup([
-						{
-							txn: trxs,
-							shouldSign: true,
-						},
-					]);
-
-					break;
-				}
-				default: {
-					console.log("Invalid wallet type connected");
-					break;
-				}
+			} catch (error) {
+				this.displayError(error);
+				console.log(error);
 			}
 		},
 	},
