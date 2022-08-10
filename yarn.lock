@@ -5,7 +5,7 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@algo-builder/algob@npm:^5.0.0":
+"@algo-builder/algob@npm:^5.0.1":
   version: 5.0.1
   resolution: "@algo-builder/algob@npm:5.0.1"
   dependencies:
@@ -59,7 +59,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@algo-builder/web@npm:5.0.1, @algo-builder/web@npm:^5.0.0":
+"@algo-builder/web@npm:5.0.1, @algo-builder/web@npm:^5.0.1":
   version: 5.0.1
   resolution: "@algo-builder/web@npm:5.0.1"
   dependencies:
@@ -3249,8 +3249,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "algobuilder-msig@workspace:."
   dependencies:
-    "@algo-builder/algob": ^5.0.0
-    "@algo-builder/web": ^5.0.0
+    "@algo-builder/algob": ^5.0.1
+    "@algo-builder/web": ^5.0.1
     "@ant-design/icons-vue": ^6.1.0
     "@babel/core": ^7.17.7
     "@babel/eslint-parser": ^7.17.0

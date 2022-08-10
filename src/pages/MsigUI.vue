@@ -56,8 +56,8 @@ import {
 import { WalletType, contentlist } from "@/types";
 import {
 	errorMessage,
-	notSupportWallet,
-	noWallet,
+	NOT_SUPPORT_WALLET,
+	NO_WALLET,
 	openErrorNotificationWithIcon,
 	openSuccessNotificationWithIcon,
 	SIGN_SUCCESSFUL,
@@ -124,7 +124,7 @@ export default defineComponent({
 			try {
 				switch (this.walletStore.walletKind) {
 					case WalletType.MY_ALGO: {
-						openErrorNotificationWithIcon(notSupportWallet);
+						openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
 						break;
 					}
 					case WalletType.ALGOSIGNER: {
@@ -185,11 +185,11 @@ export default defineComponent({
 						break;
 					}
 					case WalletType.WALLET_CONNECT: {
-						openErrorNotificationWithIcon(notSupportWallet);
+						openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
 						break;
 					}
 					default: {
-						openErrorNotificationWithIcon(noWallet);
+						openErrorNotificationWithIcon(NO_WALLET);
 						break;
 					}
 				}

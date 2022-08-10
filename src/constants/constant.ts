@@ -20,9 +20,9 @@ export const tabList = [
 	},
 ];
 
-export const action = {
-	delete: "Delete",
-	edit: "Edit",
-	save: "Save",
-	copy: "Copy",
+export const Action = {
+	DELETE: "Delete",
+	EDIT: "Edit",
+	SAVE: "Save",
+	COPY: "Copy",
 };

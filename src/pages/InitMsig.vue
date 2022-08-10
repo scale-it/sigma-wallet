@@ -121,10 +121,12 @@ import {
 	errorMessage,
 	openErrorNotificationWithIcon,
 	tabList,
-	wrongAddress,
-	wrongAddressDes,
-	noWallet,
-	notSupportWallet,
+	WRONG_ADDRESS,
+	WRONG_ADDRESSES,
+	NO_WALLET,
+	NOT_SUPPORT_WALLET,
+	openSuccessNotificationWithIcon,
+	SIGN_SUCCESSFUL,
 } from "@/constants";
 import {
 	convertBase64ToUnit8Array,
@@ -196,7 +198,7 @@ export default defineComponent({
 			try {
 				switch (this.walletStore.walletKind) {
 					case WalletType.MY_ALGO: {
-						openErrorNotificationWithIcon(notSupportWallet);
+						openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
 						break;
 					}
 					case WalletType.ALGOSIGNER: {
@@ -220,7 +222,7 @@ export default defineComponent({
 						};
 						let multisigaddr = algosdk.multisigAddress(multisigParams);
 						if (fromAddr != multisigaddr) {
-							openErrorNotificationWithIcon(wrongAddress, wrongAddressDes);
+							openErrorNotificationWithIcon(WRONG_ADDRESS, WRONG_ADDRESSES);
 							break;
 						}
 						let signedTxn = await signAlgoSigner.signTransaction([
@@ -234,14 +236,16 @@ export default defineComponent({
 						const arr = convertBase64ToUnit8Array(this.contentList.MSG_PACK);
 						const newJson = algosdk.decodeSignedTransaction(arr);
 						this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
+						openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
+						this.key = "JSON";
 						break;
 					}
 					case WalletType.WALLET_CONNECT: {
-						openErrorNotificationWithIcon(notSupportWallet);
+						openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
 						break;
 					}
 					default: {
-						openErrorNotificationWithIcon(noWallet);
+						openErrorNotificationWithIcon(NO_WALLET);
 						break;
 					}
 				}
