@@ -123,6 +123,8 @@ import {
 	tabList,
 	wrongAddress,
 	wrongAddressDes,
+	noWallet,
+	notSupportWallet,
 } from "@/constants";
 import {
 	convertBase64ToUnit8Array,
@@ -138,7 +140,7 @@ import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
 let id = 0;
 
 export default defineComponent({
-	name: "Init multisignature transaction UI",
+	name: "MsigTx Creator",
 	components: {
 		MultisigParameters,
 		IconWithToolTip,
@@ -155,7 +157,6 @@ export default defineComponent({
 		const key = ref("tab1");
 
 		const onTabChange = (value: string, type: string) => {
-			console.log(value, type);
 			if (type === "key") {
 				key.value = value;
 			}
@@ -195,6 +196,7 @@ export default defineComponent({
 			try {
 				switch (this.walletStore.walletKind) {
 					case WalletType.MY_ALGO: {
+						openErrorNotificationWithIcon(notSupportWallet);
 						break;
 					}
 					case WalletType.ALGOSIGNER: {
@@ -235,23 +237,11 @@ export default defineComponent({
 						break;
 					}
 					case WalletType.WALLET_CONNECT: {
-						let signWalletConnect = this.walletStore
-							.webMode as WallectConnectSession;
-
-						let trxs = algosdk.decodeUnsignedTransaction(
-							convertBase64ToUnit8Array(txnBase64)
-						);
-						let signedJson = await signWalletConnect.signTransactionGroup([
-							{
-								txn: trxs,
-								shouldSign: true,
-							},
-						]);
-
+						openErrorNotificationWithIcon(notSupportWallet);
 						break;
 					}
 					default: {
-						console.log("Invalid wallet type connected");
+						openErrorNotificationWithIcon(noWallet);
 						break;
 					}
 				}

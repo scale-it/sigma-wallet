@@ -5,15 +5,15 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@algo-builder/algob@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@algo-builder/algob@npm:4.0.0"
+"@algo-builder/algob@npm:^5.0.0":
+  version: 5.0.1
+  resolution: "@algo-builder/algob@npm:5.0.1"
   dependencies:
-    "@algo-builder/runtime": 4.0.0
-    "@algo-builder/web": 4.0.0
-    algosdk: ^1.16.0
+    "@algo-builder/runtime": 5.0.1
+    "@algo-builder/web": 5.0.1
+    algosdk: ^1.18.1
     chalk: ^4.1.2
-    debug: ^4.3.3
+    debug: ^4.3.4
     deep-equal: ^2.0.5
     deepmerge: ^4.2.2
     download-git-repo: ^3.0.2
@@ -31,17 +31,19 @@ __metadata:
     zod: ^3.13.4
   bin:
     algob: build/internal/cli/cli.js
-  checksum: b7bd9c39c9c34d921d860bd0de72a2b7596742caf10d4772915e50c40645439a1da5f8b44807335ecaa896585d1b8cecc61e6ec1ce54430e625605cb1d607d56
+  checksum: d70f8db778785b35906923b1c1cdc2f52c5788481182b49a72d61d00797223646526853c8ff416c253d0911cd24b3f2727bbc88a5a9c08225f925d4563738f4b
   languageName: node
   linkType: hard
 
-"@algo-builder/runtime@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@algo-builder/runtime@npm:4.0.0"
+"@algo-builder/runtime@npm:5.0.1":
+  version: 5.0.1
+  resolution: "@algo-builder/runtime@npm:5.0.1"
   dependencies:
-    "@algo-builder/web": 4.0.0
+    "@algo-builder/web": 5.0.1
     "@nodelib/fs.walk": ^1.2.8
-    algosdk: ^1.16.0
+    algosdk: ^1.18.1
+    chalk: ^4.1.2
+    debug: ^4.3.4
     elliptic: ^6.5.4
     hi-base32: ^0.5.1
     js-sha256: ^0.9.0
@@ -53,22 +55,23 @@ __metadata:
     tweetnacl-ts: ^1.0.3
     yaml: ^1.10.2
     zod: ^3.13.4
-  checksum: 6238eea873954475f12db3a174c7eb08b4c2beb4b35cf7e586d6a6fff263ad03bf73f9dc8c701077b787400eeb795b6913798ee1c0cf8a1d979ae3bc4ed95eb6
+  checksum: 05554e1ff6c59e6e10366837029f62ac2683c7ad5865090e583948446384a5705b288103570dbf9b30aa28f1d68891e97cd51b7c6d83d3fa39043731d86ff823
   languageName: node
   linkType: hard
 
-"@algo-builder/web@npm:4.0.0, @algo-builder/web@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@algo-builder/web@npm:4.0.0"
+"@algo-builder/web@npm:5.0.1, @algo-builder/web@npm:^5.0.0":
+  version: 5.0.1
+  resolution: "@algo-builder/web@npm:5.0.1"
   dependencies:
     "@json-rpc-tools/utils": ^1.7.6
     "@randlabs/myalgo-connect": ^1.1.2
     "@walletconnect/client": ^1.6.6
     "@walletconnect/types": ^1.7.1
     algorand-walletconnect-qrcode-modal: ^1.7.4
-    algosdk: ^1.16.0
+    algosdk: ^1.18.1
+    debug: ^4.3.4
     zod: ^3.13.4
-  checksum: d1d77a879c742647144ea78abddd652631d1b94312978f1510e687eecee89dde478b6d6ebb56c6d055e2c8666119d420d3851fc112ac96c84018cb2e4b5ed9b4
+  checksum: feb78bf346782fbea020e814678cbde09a25cdb180692b94448d3b4d076e31e810da6b4bf9aceda65eb852f7eef9487fd3fa8330f595a458be8bb1f14cc8cdfb
   languageName: node
   linkType: hard
 
@@ -3246,8 +3249,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "algobuilder-msig@workspace:."
   dependencies:
-    "@algo-builder/algob": ^4.0.0
-    "@algo-builder/web": ^4.0.0
+    "@algo-builder/algob": ^5.0.0
+    "@algo-builder/web": ^5.0.0
     "@ant-design/icons-vue": ^6.1.0
     "@babel/core": ^7.17.7
     "@babel/eslint-parser": ^7.17.0
@@ -3305,6 +3308,28 @@ __metadata:
     tweetnacl: ^1.0.3
     url-parse: ^1.5.1
   checksum: 5a1f17fce00b448fd037dfbd8bf3b9bc7974f78c92dccd0ac962478f16b954b691c22af35291e04a72ef79a01663fa38c7a2142873bdbefd1c8bf7fac7caf97c
+  languageName: node
+  linkType: hard
+
+"algosdk@npm:^1.18.1":
+  version: 1.19.0
+  resolution: "algosdk@npm:1.19.0"
+  dependencies:
+    algo-msgpack-with-bigint: ^2.1.1
+    buffer: ^6.0.2
+    fsevents: 2.1.2
+    hi-base32: ^0.5.1
+    js-sha256: ^0.9.0
+    js-sha3: ^0.8.0
+    js-sha512: ^0.8.0
+    json-bigint: ^1.0.0
+    superagent: ^6.1.0
+    tweetnacl: ^1.0.3
+    vlq: ^2.0.4
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  checksum: e7503171a587cab6816459cb68b37e2e8a8b9fd253d02843026bc14120f883be593cdfd55ba490ca57cb2399ffaaf68a4704d3e9a7a19dbf97fb094514a5abfe
   languageName: node
   linkType: hard
 
@@ -4837,7 +4862,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:4.3.3, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.3":
+"debug@npm:4, debug@npm:4.3.3, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2":
   version: 4.3.3
   resolution: "debug@npm:4.3.3"
   dependencies:
@@ -4855,6 +4880,18 @@ __metadata:
   dependencies:
     ms: ^2.1.1
   checksum: b3d8c5940799914d30314b7c3304a43305fd0715581a919dacb8b3176d024a782062368405b47491516d2091d6462d4d11f2f4974a405048094f8bfebfa3071c
+  languageName: node
+  linkType: hard
+
+"debug@npm:^4.3.4":
+  version: 4.3.4
+  resolution: "debug@npm:4.3.4"
+  dependencies:
+    ms: 2.1.2
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 3dbad3f94ea64f34431a9cbf0bafb61853eda57bff2880036153438f50fb5a84f27683ba0d8e5426bf41a8c6ff03879488120cf5b3a761e77953169c0600a708
   languageName: node
   linkType: hard
 
@@ -6278,12 +6315,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:2.1.2":
+  version: 2.1.2
+  resolution: "fsevents@npm:2.1.2"
+  dependencies:
+    node-gyp: latest
+  checksum: 63fe1ba77b63d5da5dde6112c5f0eb161b9d18a61427a8a49d661eeed080189d99e8f9da11bb6b75ecd5129a69edc5757d60a4eb0bbada6de68d5156c382c5e1
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:~2.3.2":
   version: 2.3.2
   resolution: "fsevents@npm:2.3.2"
   dependencies:
     node-gyp: latest
   checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
+"fsevents@patch:fsevents@2.1.2#~builtin<compat/fsevents>":
+  version: 2.1.2
+  resolution: "fsevents@patch:fsevents@npm%3A2.1.2#~builtin<compat/fsevents>::version=2.1.2&hash=18f3a7"
+  dependencies:
+    node-gyp: latest
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -11445,6 +11501,13 @@ __metadata:
   version: 1.1.2
   resolution: "vary@npm:1.1.2"
   checksum: ae0123222c6df65b437669d63dfa8c36cee20a504101b2fcd97b8bf76f91259c17f9f2b4d70a1e3c6bbcee7f51b28392833adb6b2770b23b01abec84e369660b
+  languageName: node
+  linkType: hard
+
+"vlq@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "vlq@npm:2.0.4"
+  checksum: b2ed0d3a5423f34bba98a18250f8b13a96eebff9c8f9427fa9cd78065d31f35641f6fd659c5642253b79532000a37aec0582abac95d1ef4af2cd0c96a716f1b6
   languageName: node
   linkType: hard
 

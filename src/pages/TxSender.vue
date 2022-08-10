@@ -68,7 +68,6 @@ import WalletStore from "@/store/WalletStore";
 import {
 	convertBase64ToUnit8Array,
 	formatJSON,
-	convertToBase64,
 	prettifyTransaction,
 } from "@/utilities";
 import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";

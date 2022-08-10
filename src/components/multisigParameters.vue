@@ -67,6 +67,7 @@ import {
 	CHECK_ICON_COLOR,
 	CLOSE_ICON_COLOR,
 	successCopyAddress,
+	successMessageAnnounce,
 } from "@/constants";
 import InfoToolTip from "@/components/InfoToolTip.vue";
 import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
@@ -117,7 +118,7 @@ export default defineComponent({
 		},
 		copy(address: string) {
 			copyToClipboard(address);
-			successCopyAddress(address);
+			successMessageAnnounce("Address [" + address + "] copied!");
 		},
 	},
 	watch: {

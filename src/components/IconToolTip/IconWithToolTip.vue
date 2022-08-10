@@ -5,10 +5,10 @@
 				{{ data }}
 			</p>
 		</template>
-		<DeleteOutlined v-if="icon === 'Delete'" />
-		<SaveOutlined v-if="icon === 'Save'" />
-		<EditOutlined v-if="icon === 'Edit'" />
-		<CopyOutlined v-if="icon === 'Copy'" />
+		<DeleteOutlined v-if="icon === action.delete" />
+		<SaveOutlined v-if="icon === action.save" />
+		<EditOutlined v-if="icon === action.edit" />
+		<CopyOutlined v-if="icon === action.copy" />
 	</a-popover>
 </template>
 
@@ -21,6 +21,8 @@ import {
 	CopyOutlined,
 } from "@ant-design/icons-vue";
 
+import { action } from "@/constants";
+
 export default defineComponent({
 	name: "IconWithToolTip",
 	components: {
@@ -30,5 +32,10 @@ export default defineComponent({
 		CopyOutlined,
 	},
 	props: ["data", "icon"],
+	data() {
+		return {
+			action,
+		};
+	},
 });
 </script>

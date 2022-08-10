@@ -56,7 +56,11 @@ import {
 import { WalletType, contentlist } from "@/types";
 import {
 	errorMessage,
+	notSupportWallet,
+	noWallet,
 	openErrorNotificationWithIcon,
+	openSuccessNotificationWithIcon,
+	SIGN_SUCCESSFUL,
 	tabList,
 } from "@/constants";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
@@ -88,7 +92,6 @@ export default defineComponent({
 		const key = ref("tab1");
 
 		const onTabChange = (value: string, type: string) => {
-			console.log(value, type);
 			if (type === "key") {
 				key.value = value;
 			}
@@ -121,14 +124,7 @@ export default defineComponent({
 			try {
 				switch (this.walletStore.walletKind) {
 					case WalletType.MY_ALGO: {
-						let signMyAlgo = this.walletStore.webMode as MyAlgoWalletSession;
-
-						let trxs = algosdk.decodeUnsignedTransaction(
-							convertBase64ToUnit8Array(txnBase64)
-						);
-						let tmpSign = await signMyAlgo.signTransaction(trxs);
-						console.log(tmpSign);
-
+						openErrorNotificationWithIcon(notSupportWallet);
 						break;
 					}
 					case WalletType.ALGOSIGNER: {
@@ -184,26 +180,16 @@ export default defineComponent({
 						const newJson = algosdk.decodeSignedTransaction(combineBlob);
 						this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
 						this.signed = true;
+						this.key = "JSON";
+						openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 						break;
 					}
 					case WalletType.WALLET_CONNECT: {
-						let signWalletConnect = this.walletStore
-							.webMode as WallectConnectSession;
-
-						let trxs = algosdk.decodeUnsignedTransaction(
-							convertBase64ToUnit8Array(txnBase64)
-						);
-						let signedJson = await signWalletConnect.signTransactionGroup([
-							{
-								txn: trxs,
-								shouldSign: true,
-							},
-						]);
-
+						openErrorNotificationWithIcon(notSupportWallet);
 						break;
 					}
 					default: {
-						console.log("Invalid wallet type connected");
+						openErrorNotificationWithIcon(noWallet);
 						break;
 					}
 				}
