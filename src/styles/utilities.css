@@ -6,6 +6,10 @@
 	margin-top: 1.5rem;
 }
 
+.margin_left_sm {
+	margin-left: 0.5rem;
+}
+
 .padding_med {
 	padding: 1.5rem;
 }
@@ -13,6 +17,7 @@
 .list_addresses {
 	word-wrap: break-word;
 	font-size: 90%;
+	word-break: break-all;
 }
 
 .med_font_size {

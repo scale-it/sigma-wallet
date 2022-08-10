@@ -2,18 +2,53 @@
 	<div class="margin_top_med">
 		<a-card title="Multisignature parameters">
 			Addresses:
-			<li
-				v-for="ADDRESSES in mparams.addresses"
-				:key="ADDRESSES.address"
-				class="list_addresses"
-			>
-				<CheckCircleTwoTone v-if="ADDRESSES.signed" twoToneColor="LightGreen" />
-				<CloseCircleTwoTone twoToneColor="red" v-else />
-				{{ ADDRESSES.address }}
-			</li>
-			<p class="margin_top_med">
-				Threshold: {{ mparams.threshold }}/{{ mparams.addresses.length }}
-			</p>
+			<a-list size="small" :data-source="mparams.addresses">
+				<template #renderItem="{ item }">
+					<a-list-item class="list_addresses">
+						<CheckCircleOutlined
+							v-if="item.signed"
+							:style="'color: ' + CHECK_ICON_COLOR"
+						/>
+						<CloseCircleOutlined v-else :style="'color: ' + CLOSE_ICON_COLOR" />
+						{{ getTruncatedAddress(item.address) }}
+						<template #actions>
+							<a-button
+								type="link"
+								shape="circle"
+								size="small"
+								ghost
+								@click="copy(item.address)"
+							>
+								<template #icon>
+									<IconWithToolTip :data="'Copy'" :icon="'Copy'" />
+								</template>
+							</a-button>
+						</template>
+					</a-list-item>
+				</template>
+			</a-list>
+			<div class="margin_top_med">
+				<div v-if="mparams.addresses.length != 0">
+					Threshold : {{ mparams.threshold }}/{{ mparams.addresses.length }}
+					<InfoToolTip
+						:data="
+							mparams.threshold +
+							' out of ' +
+							mparams.addresses.length +
+							' signatures are required to approve the transaction'
+						"
+						class="margin_left_sm"
+					/>
+				</div>
+				<div v-else>
+					Threshold : {{ mparams.threshold }}/{{ mparams.addresses.length }}
+					<InfoToolTip
+						:data="'Number of signature required to approve the transaction'"
+						class="margin_left_sm"
+					/>
+				</div>
+			</div>
+
 			<p>Version: {{ mparams.version }}</p>
 		</a-card>
 	</div>
@@ -21,17 +56,30 @@
 
 <script lang="ts">
 import { MultisignatureParam } from "@/types";
-import { convertBase64ToUnit8Array } from "@/utilities";
-import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons-vue/";
+import { convertBase64ToUnit8Array, copyToClipboard } from "@/utilities";
+import {
+	CheckCircleOutlined,
+	CloseCircleOutlined,
+} from "@ant-design/icons-vue/";
 import algosdk from "algosdk";
 import { defineComponent } from "vue";
+import {
+	CHECK_ICON_COLOR,
+	CLOSE_ICON_COLOR,
+	successCopyAddress,
+	successMessageAnnounce,
+} from "@/constants";
+import InfoToolTip from "@/components/InfoToolTip.vue";
+import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
 
 export default defineComponent({
 	name: "Multiparameters-box",
 	props: ["inputBase64"],
 	components: {
-		CheckCircleTwoTone,
-		CloseCircleTwoTone,
+		CloseCircleOutlined,
+		CheckCircleOutlined,
+		InfoToolTip,
+		IconWithToolTip,
 	},
 	data() {
 		const mparams: MultisignatureParam = {
@@ -43,6 +91,8 @@ export default defineComponent({
 		return {
 			mparams,
 			input: "base64",
+			CHECK_ICON_COLOR,
+			CLOSE_ICON_COLOR,
 		};
 	},
 	methods: {
@@ -62,6 +112,13 @@ export default defineComponent({
 					signed,
 				};
 			});
+		},
+		getTruncatedAddress(addr: string) {
+			return addr.substring(0, 13) + "..." + addr.slice(-13);
+		},
+		copy(address: string) {
+			copyToClipboard(address);
+			successMessageAnnounce("Address [" + address + "] copied!");
 		},
 	},
 	watch: {

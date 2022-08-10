@@ -22,3 +22,10 @@ export const errorMessage = (key: string) => {
 };
 
 export const UNSUCCESSFUL = "Unsuccessful";
+export const WRONG_ADDRESS = "Wrong multisigature parameters!";
+export const WRONG_ADDRESSES =
+	"Address generate from multisignature parameters is not equal to the sender of the transaction";
+
+export const NO_WALLET = "You need to login your wallet to sign transaction!";
+export const NOT_SUPPORT_WALLET =
+	"We are currently unable to support MyAlgo and Wallet Connect to sign multisigature transaction";

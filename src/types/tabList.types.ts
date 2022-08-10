@@ -8,3 +8,8 @@ export type MultisignatureParam = {
 	threshold: number;
 	version: number;
 };
+
+export type listAddresses = {
+	id: number;
+	address: string;
+};

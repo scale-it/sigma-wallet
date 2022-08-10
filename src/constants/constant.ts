@@ -19,3 +19,10 @@ export const tabList = [
 		tab: formatTypes.MSG_PACK,
 	},
 ];
+
+export const Action = {
+	DELETE: "Delete",
+	EDIT: "Edit",
+	SAVE: "Save",
+	COPY: "Copy",
+};
