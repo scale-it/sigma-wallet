@@ -90,6 +90,7 @@ export default defineComponent({
 		});
 
 		const key = ref("tab1");
+		const myalgo = shallowRef();
 
 		const onTabChange = (value: string, type: string) => {
 			if (type === "key") {
@@ -109,6 +110,7 @@ export default defineComponent({
 			...toRefs(state),
 			key,
 			onTabChange,
+			myalgo,
 		};
 	},
 	methods: {
@@ -124,7 +126,14 @@ export default defineComponent({
 			try {
 				switch (this.walletStore.walletKind) {
 					case WalletType.MY_ALGO: {
-						openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
+						this.myalgo = this.walletStore.webMode as MyAlgoWalletSession;
+						console.log(this.myalgo);
+						console.log(this.walletStore.webMode);
+						let Trxs = algosdk.decodeUnsignedTransaction(
+							Buffer.from(txnBase64, "base64")
+						);
+						let tmpSign = await this.myalgo.signTransaction(Trxs);
+						console.log(tmpSign);
 						break;
 					}
 					case WalletType.ALGOSIGNER: {
