@@ -171,8 +171,10 @@ export default defineComponent({
 							{
 								txn: txnBase64Signing,
 								msig: multisigParams,
+								signers: [this.walletStore.address],
 							},
 						]);
+						console.log(signedTxn);
 						const json = signedTxn[0] as JsonPayload;
 						const blob = json.blob as string;
 

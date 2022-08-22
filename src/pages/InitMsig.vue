@@ -229,6 +229,7 @@ export default defineComponent({
 							{
 								txn: txnBase64,
 								msig: multisigParams,
+								signers: [this.walletStore.address],
 							},
 						]);
 						const json = signedTxn[0] as JsonPayload;
