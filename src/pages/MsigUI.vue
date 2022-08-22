@@ -129,55 +129,21 @@ export default defineComponent({
 					}
 					case WalletType.ALGOSIGNER: {
 						let signAlgoSigner = this.walletStore.webMode as WebMode;
-						let jsonObject = algosdk.decodeObj(
-							convertBase64ToUnit8Array(txnBase64)
-						) as algosdk.EncodedSignedTransaction;
-						if (jsonObject.txn === undefined) {
-							openErrorNotificationWithIcon(
-								"Input transaction must be multisigature transaction signed at least 1 signature"
-							);
-							break;
-						}
-						let msig = algosdk.Transaction.from_obj_for_encoding(
-							jsonObject.txn
+
+						const json = await signAlgoSigner.appendSignMultisigTransaction(
+							[
+								{
+									txn: txnBase64,
+								},
+							],
+							[this.walletStore.address]
 						);
-						const bytes = algosdk.encodeObj(msig.get_obj_for_encoding());
-						const txnBase64Signing = convertToBase64(bytes); // base64 of the transaction without signature
-						const mparams = jsonObject.msig as algosdk.EncodedMultisig; // get information from subsig
-
-						const version = mparams.v;
-						const threshold = mparams.thr;
-						const addr = mparams.subsig.map((signData) => {
-							let address = algosdk.encodeAddress(signData.pk) as string;
-							return address;
-						});
-
-						const multisigParams = {
-							version: version,
-							threshold: threshold,
-							addrs: addr,
-						};
-
-						signedTxn = await signAlgoSigner.signTransaction([
-							{
-								txn: txnBase64Signing,
-								msig: multisigParams,
-							},
-						]);
-						const json = signedTxn[0] as JsonPayload;
-						const blob = json.blob as string;
-
-						const blob1 = convertBase64ToUnit8Array(txnBase64);
-						const blob2 = convertBase64ToUnit8Array(blob);
-						const combineBlob = algosdk.mergeMultisigTransactions([
-							blob1,
-							blob2,
-						]);
-
-						const outputBase64 = convertToBase64(combineBlob);
+						const blob = json[0] as JsonPayload;
+						const outputBase64 = blob.blob as string;
 						this.contentList.MSG_PACK = outputBase64;
-
-						const newJson = algosdk.decodeSignedTransaction(combineBlob);
+						const newJson = algosdk.decodeSignedTransaction(
+							convertBase64ToUnit8Array(outputBase64)
+						);
 						this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
 						this.signed = true;
 						this.key = "JSON";

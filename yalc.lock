@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "@algo-builder/web": {
+      "signature": "ce014d1c59ed8e7dae8ae6d6e0971ac9",
+      "file": true,
+      "replaced": "^5.0.1"
+    }
+  }
+}
