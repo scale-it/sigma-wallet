@@ -3,6 +3,13 @@
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Partial sign transaction</h3>
+				<p>
+					Here you can add your partially signed transaction in base64 Msgpack
+					and sign it by connecting your account using different wallets and
+					also look at the various details about the transaction like addresses
+					details to know who can sign, the threshold limit and version to see
+					if transaction can be executed.
+				</p>
 				<div class="sign_field">
 					<a-textarea
 						v-model:value="unsignedJson"
@@ -17,6 +24,12 @@
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
+				<p>
+					This is a preview of your multisigned transaction which you can access
+					in JSON or Msgpack, which you can use to send the transaction to the
+					network using the
+					<a @click="propsHomeTabChange(Tabs.TxSender)">Tx Sender</a> Tab.
+				</p>
 				<a-card
 					class="card"
 					title="Format Transaction"
@@ -53,7 +66,7 @@ import {
 	WallectConnectSession,
 	WebMode,
 } from "@algo-builder/web";
-import { WalletType, contentlist } from "@/types";
+import { WalletType, contentlist, Tabs } from "@/types";
 import {
 	errorMessage,
 	NOT_SUPPORT_WALLET,
@@ -76,6 +89,9 @@ export default defineComponent({
 	name: "Multisignature UI",
 	components: {
 		MultisigParameters,
+	},
+	props: {
+		onHomeTabChange: Function,
 	},
 	data() {
 		const walletStore = WalletStore();
@@ -109,9 +125,13 @@ export default defineComponent({
 			...toRefs(state),
 			key,
 			onTabChange,
+			Tabs,
 		};
 	},
 	methods: {
+		propsHomeTabChange(value: Tabs) {
+			typeof this.onHomeTabChange === "function" && this.onHomeTabChange(value);
+		},
 		displayError(error: Error) {
 			errorMessage(this.key);
 			openErrorNotificationWithIcon(error.message);

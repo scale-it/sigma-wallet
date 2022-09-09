@@ -1,10 +1,10 @@
 <template>
 	<a-tabs centered v-model:activeKey="activeKey" type="card">
-		<a-tab-pane :key="Tabs.InitMsig" tab="Init multisigTxn">
-			<InitMsig />
+		<a-tab-pane :key="Tabs.InitMsig" tab="Init MultiSig Txn">
+			<InitMsig :onHomeTabChange="(value:number) => changeTab(value)" />
 		</a-tab-pane>
 		<a-tab-pane :key="Tabs.Msig" tab="MultiSig">
-			<msig />
+			<msig :onHomeTabChange="(value:number) => changeTab(value)" />
 		</a-tab-pane>
 		<a-tab-pane :key="Tabs.TxSender" tab="Tx Sender">
 			<sender />
@@ -26,9 +26,14 @@ export default defineComponent({
 	},
 	setup() {
 		return {
-			activeKey: ref(Tabs.Msig),
+			activeKey: ref(Tabs.InitMsig),
 			Tabs,
 		};
+	},
+	methods: {
+		changeTab(value: Tabs) {
+			this.activeKey = value;
+		},
 	},
 });
 </script>

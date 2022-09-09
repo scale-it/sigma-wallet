@@ -3,6 +3,16 @@
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Unsigned transaction</h3>
+				<p>
+					Here you can add your multisignature transaction parameters like
+					addresses, threshold, version, along with providing the
+					<a
+						href="https://algorand.github.io/js-algorand-sdk/classes/Transaction.html"
+						target="_blank"
+						>algosdk.Transaction</a
+					>
+					in base64 Msgpack.
+				</p>
 				<div class="sign_field">
 					<a-textarea
 						v-model:value="unsignedInput"
@@ -86,6 +96,12 @@
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
+				<p>
+					This is the preview of your multisigature transaction created in JSON
+					and Msgpack using the parameters you provided in left column which you
+					can sign using
+					<a @click="propsHomeTabChange(Tabs.Msig)">MultiSig</a> Tab.
+				</p>
 				<a-card
 					class="card"
 					title="Format Transaction"
@@ -114,7 +130,7 @@
 </template>
 
 <script lang="ts">
-import { contentlist, listAddresses, WalletType } from "@/types";
+import { contentlist, listAddresses, WalletType, Tabs } from "@/types";
 import { defineComponent, ref } from "vue";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
@@ -147,6 +163,9 @@ export default defineComponent({
 		MultisigParameters,
 		IconWithToolTip,
 	},
+	props: {
+		onHomeTabChange: Function,
+	},
 	data() {
 		const addresses: listAddresses[] = [];
 		const contentList: contentlist = {
@@ -175,9 +194,13 @@ export default defineComponent({
 			tabList,
 			contentList,
 			walletStore,
+			Tabs,
 		};
 	},
 	methods: {
+		propsHomeTabChange(value: Tabs) {
+			typeof this.onHomeTabChange === "function" && this.onHomeTabChange(value);
+		},
 		addAddress() {
 			this.addresses.push({
 				id: id++,
