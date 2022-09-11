@@ -4,8 +4,8 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
 				<h2>Transaction Input</h2>
 				<p>
-					Here you can add your multisigned transaction in base64 Msgpack format
-					which you want to send to the network.
+					Here you can add your transaction in base64 Msgpack format which you
+					want to send to the network.
 				</p>
 				<a-textarea
 					placeholder="Base64 msgpack"
@@ -27,9 +27,7 @@
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
 				<h2>Transaction preview</h2>
-				<p>
-					This is the preview of your multisigned transaction in JSON format.
-				</p>
+				<p>This is the preview of your signed transaction in JSON format.</p>
 				<a-textarea
 					class="text_area"
 					:style="txOutput.length"
@@ -51,8 +49,8 @@
 			<div>
 				<h2>Transaction Receipt</h2>
 				<p>
-					This is the confirmed response of your multisigned transaction sent to
-					the network.
+					This is the confirmed response of your signed transaction sent to the
+					network.
 				</p>
 				<div>
 					<a class="med_font_size" :href="algoExplorerURl" target="_blank"

@@ -51,7 +51,10 @@
 						:disabled="true"
 					/>
 				</a-card>
-				<MultisigParameters :inputBase64="contentList.MSG_PACK" />
+				<MultisigParameters
+					@get-address="(value) => saveAddress(value)"
+					:inputBase64="contentList.MSG_PACK"
+				/>
 			</a-col>
 		</a-row>
 	</a-layout-content>
@@ -126,9 +129,28 @@ export default defineComponent({
 			key,
 			onTabChange,
 			Tabs,
+			addresses: [""],
 		};
 	},
 	methods: {
+		saveAddress(value: string[]) {
+			console.log("value", value);
+		},
+		checkAddress() {
+			console.log(this.addresses);
+			if (
+				Array.isArray(this.addresses) &&
+				!this.addresses?.includes(this.walletStore.address)
+			) {
+				this.displayError(
+					new Error(
+						"Connected account address is not part of the given multisig transaction."
+					)
+				);
+				return false;
+			}
+			return true;
+		},
 		propsHomeTabChange(value: Tabs) {
 			typeof this.onHomeTabChange === "function" && this.onHomeTabChange(value);
 		},
@@ -137,6 +159,7 @@ export default defineComponent({
 			openErrorNotificationWithIcon(error.message);
 		},
 		async sign() {
+			if (!this.checkAddress()) return;
 			let txnBase64 = "";
 			let signedTxn: JsonPayload;
 			txnBase64 = this.unsignedJson;
