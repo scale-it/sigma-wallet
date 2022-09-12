@@ -20,7 +20,10 @@
 					</a-textarea>
 				</div>
 				<a-button type="primary" @click="sign">SIGN</a-button>
-				<MultisigParameters :inputBase64="unsignedJson" />
+				<MultisigParameters
+					@get-address="setAddresses"
+					:inputBase64="unsignedJson"
+				/>
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
@@ -51,10 +54,7 @@
 						:disabled="true"
 					/>
 				</a-card>
-				<MultisigParameters
-					@get-address="(value) => saveAddress(value)"
-					:inputBase64="contentList.MSG_PACK"
-				/>
+				<MultisigParameters :inputBase64="contentList.MSG_PACK" />
 			</a-col>
 		</a-row>
 	</a-layout-content>
@@ -129,18 +129,20 @@ export default defineComponent({
 			key,
 			onTabChange,
 			Tabs,
-			addresses: [""],
+			addresses: [],
 		};
 	},
 	methods: {
-		saveAddress(value: string[]) {
-			console.log("value", value);
+		setAddresses(value: any) {
+			this.addresses = value;
 		},
 		checkAddress() {
-			console.log(this.addresses);
 			if (
 				Array.isArray(this.addresses) &&
-				!this.addresses?.includes(this.walletStore.address)
+				!this.addresses.find(
+					(item: { address: string; signed: boolean }) =>
+						(item.address = this.walletStore.address)
+				)
 			) {
 				this.displayError(
 					new Error(
@@ -177,7 +179,7 @@ export default defineComponent({
 						) as algosdk.EncodedSignedTransaction;
 						if (jsonObject.txn === undefined) {
 							openErrorNotificationWithIcon(
-								"Input transaction must be multisigature transaction signed at least 1 signature"
+								"Input transaction must be multisigature transaction signed by at least 1 address."
 							);
 							break;
 						}
