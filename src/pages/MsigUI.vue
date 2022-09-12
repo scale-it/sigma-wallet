@@ -21,7 +21,7 @@
 				</div>
 				<a-button type="primary" @click="sign">SIGN</a-button>
 				<MultisigParameters
-					@get-address="setAddresses"
+					@getAddress="setAddresses"
 					:inputBase64="unsignedJson"
 				/>
 			</a-col>
@@ -129,19 +129,19 @@ export default defineComponent({
 			key,
 			onTabChange,
 			Tabs,
-			addresses: [],
+			msigAddresses: [],
 		};
 	},
 	methods: {
 		setAddresses(value: any) {
-			this.addresses = value;
+			this.msigAddresses = value;
 		},
 		checkAddress() {
 			if (
-				Array.isArray(this.addresses) &&
-				!this.addresses.find(
+				Array.isArray(this.msigAddresses) &&
+				!this.msigAddresses.find(
 					(item: { address: string; signed: boolean }) =>
-						(item.address = this.walletStore.address)
+						item.address === this.walletStore.address
 				)
 			) {
 				this.displayError(
