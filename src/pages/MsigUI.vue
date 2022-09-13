@@ -4,11 +4,8 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Partial sign transaction</h3>
 				<p>
-					Here you can add your partially signed transaction in base64 Msgpack
-					and sign it by connecting your account using different wallets and
-					also look at the various details about the transaction like addresses
-					details to know who can sign, the threshold limit and version to see
-					if transaction can be executed.
+					Add a new or a partially signed transaction in base64 Msgpack
+					and sign it by connecting your account using web wallets.
 				</p>
 				<div class="sign_field">
 					<a-textarea
