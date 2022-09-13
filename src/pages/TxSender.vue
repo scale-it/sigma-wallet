@@ -4,7 +4,8 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
 				<h2>Transaction Input</h2>
 				<p>
-					Add a transaction in base64 Msgpack format and send it to the Algorand blockchain.
+					Add a transaction in base64 Msgpack format and send it to the Algorand
+					blockchain.
 				</p>
 				<a-textarea
 					placeholder="Base64 msgpack"
@@ -49,7 +50,7 @@
 				<h2>Transaction Receipt</h2>
 				<p>
 					This is the confirmed response of your signed transaction sent to the
-					network.
+					Algorand blockchain.
 				</p>
 				<div>
 					<a class="med_font_size" :href="algoExplorerURl" target="_blank"

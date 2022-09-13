@@ -4,8 +4,8 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Unsigned transaction</h3>
 				<p>
-					Specify your multisignature transaction parameters:
-					addresses, threshold, version, along with providing the
+					Specify your multisignature transaction parameters: addresses,
+					threshold, version, along with providing the
 					<a
 						href="https://algorand.github.io/js-algorand-sdk/classes/Transaction.html"
 						target="_blank"
@@ -97,9 +97,8 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
 				<p>
-					This is the preview of a new multisigature transaction
-					using the parameters you provided in left column. 
-					You can sign it in the
+					This is the preview of a new multisigature transaction created using
+					the parameters you provided in left column. You can sign it in the
 					<a @click="propsHomeTabChange(Tabs.Msig)">MultiSig</a> Tab.
 				</p>
 				<a-card
