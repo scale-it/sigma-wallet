@@ -4,7 +4,7 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Unsigned transaction</h3>
 				<p>
-					Here you can add your multisignature transaction parameters like
+					Specify your multisignature transaction parameters:
 					addresses, threshold, version, along with providing the
 					<a
 						href="https://algorand.github.io/js-algorand-sdk/classes/Transaction.html"
