@@ -97,9 +97,9 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
 				<p>
-					This is the preview of your multisigature transaction created in JSON
-					and Msgpack using the parameters you provided in left column which you
-					can sign using
+					This is the preview of a new multisigature transaction
+					using the parameters you provided in left column. 
+					You can sign it in the
 					<a @click="propsHomeTabChange(Tabs.Msig)">MultiSig</a> Tab.
 				</p>
 				<a-card
