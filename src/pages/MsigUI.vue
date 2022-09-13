@@ -61,12 +61,8 @@
 <script lang="ts">
 import WalletStore from "@/store/WalletStore";
 import algosdk, { Transaction } from "algosdk";
-import { defineComponent, reactive, toRefs, ref, shallowRef } from "vue";
-import {
-	MyAlgoWalletSession,
-	WallectConnectSession,
-	WebMode,
-} from "@algo-builder/web";
+import { defineComponent, reactive, toRefs, ref } from "vue";
+import { WebMode } from "@algo-builder/web";
 import { WalletType, contentlist, Tabs } from "@/types";
 import {
 	errorMessage,

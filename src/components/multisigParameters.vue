@@ -66,7 +66,6 @@ import { defineComponent } from "vue";
 import {
 	CHECK_ICON_COLOR,
 	CLOSE_ICON_COLOR,
-	successCopyAddress,
 	successMessageAnnounce,
 } from "@/constants";
 import InfoToolTip from "@/components/InfoToolTip.vue";

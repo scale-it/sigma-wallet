@@ -148,7 +148,7 @@ import {
 	formatJSON,
 	prettifyTransaction,
 } from "@/utilities";
-import { WebMode, WallectConnectSession } from "@algo-builder/web";
+import { WebMode } from "@algo-builder/web";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import algosdk from "algosdk";
 import WalletStore from "@/store/WalletStore";
