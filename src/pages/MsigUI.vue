@@ -25,9 +25,9 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
 				<p>
-					This is a preview of your multisigned transaction which you can access
-					in JSON or Msgpack, which you can use to send the transaction to the
-					network using the
+					This is a preview of your multisigned transaction which you can see
+					in JSON or base64 Msgpack.
+					Once all required signatures are aggregated, you can send the transaction using the 
 					<a @click="propsHomeTabChange(Tabs.TxSender)">Tx Sender</a> Tab.
 				</p>
 				<a-card
