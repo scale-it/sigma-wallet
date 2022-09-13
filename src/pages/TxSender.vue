@@ -3,6 +3,10 @@
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
 				<h2>Transaction Input</h2>
+				<p>
+					Add a transaction in base64 Msgpack format and send it to the Algorand
+					blockchain.
+				</p>
 				<a-textarea
 					placeholder="Base64 msgpack"
 					class="margin_top_med"
@@ -23,6 +27,7 @@
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
 				<h2>Transaction preview</h2>
+				<p>This is the preview of your signed transaction in JSON format.</p>
 				<a-textarea
 					class="text_area"
 					:style="txOutput.length"
@@ -43,6 +48,10 @@
 		<a-row v-if="confirmedResponse" class="margin_top_med">
 			<div>
 				<h2>Transaction Receipt</h2>
+				<p>
+					This is the confirmed response of your signed transaction sent to the
+					Algorand blockchain.
+				</p>
 				<div>
 					<a class="med_font_size" :href="algoExplorerURl" target="_blank"
 						>Open in Algo Explorer</a

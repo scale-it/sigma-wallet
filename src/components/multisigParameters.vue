@@ -66,7 +66,6 @@ import { defineComponent } from "vue";
 import {
 	CHECK_ICON_COLOR,
 	CLOSE_ICON_COLOR,
-	successCopyAddress,
 	successMessageAnnounce,
 } from "@/constants";
 import InfoToolTip from "@/components/InfoToolTip.vue";
@@ -75,6 +74,7 @@ import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
 export default defineComponent({
 	name: "Multiparameters-box",
 	props: ["inputBase64"],
+	emits: ["get-address"],
 	components: {
 		CloseCircleOutlined,
 		CheckCircleOutlined,
@@ -112,6 +112,10 @@ export default defineComponent({
 					signed,
 				};
 			});
+			this.sendAddressToParent();
+		},
+		sendAddressToParent() {
+			this.$emit("get-address", this.mparams.addresses);
 		},
 		getTruncatedAddress(addr: string) {
 			return addr.substring(0, 13) + "..." + addr.slice(-13);

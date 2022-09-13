@@ -3,6 +3,16 @@
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Unsigned transaction</h3>
+				<p>
+					Specify your multisignature transaction parameters: addresses,
+					threshold, version, along with providing the
+					<a
+						href="https://algorand.github.io/js-algorand-sdk/classes/Transaction.html"
+						target="_blank"
+						>algosdk.Transaction</a
+					>
+					in base64 Msgpack.
+				</p>
 				<div class="sign_field">
 					<a-textarea
 						v-model:value="unsignedInput"
@@ -86,6 +96,11 @@
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
+				<p>
+					This is the preview of a new multisigature transaction created using
+					the parameters you provided in left column. You can sign it in the
+					<a @click="propsHomeTabChange(Tabs.Msig)">MultiSig</a> Tab.
+				</p>
 				<a-card
 					class="card"
 					title="Format Transaction"
@@ -114,7 +129,7 @@
 </template>
 
 <script lang="ts">
-import { contentlist, listAddresses, WalletType } from "@/types";
+import { contentlist, listAddresses, WalletType, Tabs } from "@/types";
 import { defineComponent, ref } from "vue";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
@@ -133,7 +148,7 @@ import {
 	formatJSON,
 	prettifyTransaction,
 } from "@/utilities";
-import { WebMode, WallectConnectSession } from "@algo-builder/web";
+import { WebMode } from "@algo-builder/web";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import algosdk from "algosdk";
 import WalletStore from "@/store/WalletStore";
@@ -146,6 +161,9 @@ export default defineComponent({
 	components: {
 		MultisigParameters,
 		IconWithToolTip,
+	},
+	props: {
+		onHomeTabChange: Function,
 	},
 	data() {
 		const addresses: listAddresses[] = [];
@@ -175,9 +193,13 @@ export default defineComponent({
 			tabList,
 			contentList,
 			walletStore,
+			Tabs,
 		};
 	},
 	methods: {
+		propsHomeTabChange(value: Tabs) {
+			typeof this.onHomeTabChange === "function" && this.onHomeTabChange(value);
+		},
 		addAddress() {
 			this.addresses.push({
 				id: id++,
