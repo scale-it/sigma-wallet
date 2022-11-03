@@ -30,7 +30,7 @@ export function prettifyTransaction(
 	// encoding the uint8Array values to base64
 	for (const key in txn) {
 		if (ArrayBuffer.isView(txn[key])) {
-			if (key === "rcv" || key === "snd") {
+			if (key === "rcv" || key === "snd" || key === "from" || key === "to") {
 				txn[key] = encodeAddress(txn[key]);
 			} else if (key === "note") {
 				txn[key] = JSON.parse(new TextDecoder().decode(txn[key]));

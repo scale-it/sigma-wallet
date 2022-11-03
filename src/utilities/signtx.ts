@@ -29,7 +29,7 @@ export async function signMultisigUsingMyAlgoWallet(txnBase64: string) {
             initialSignedMsig?.subsig[signedIndex].s;
     }
     const outputBase64 = convertToBase64(encodeObj(
-        myAlgoSignedTxn.txn.get_obj_for_encoding()
+        myAlgoSignedTxn
     ));
     return { base64: outputBase64, json: myAlgoSignedTxn }
 
