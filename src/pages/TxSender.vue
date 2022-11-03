@@ -94,6 +94,7 @@ import {
 	WallectConnectSession,
 	WebMode,
 } from "@algo-builder/web";
+import { TxnReceipt } from "@algo-builder/web/build/types";
 
 export default defineComponent({
 	data() {
@@ -124,9 +125,7 @@ export default defineComponent({
 				onOk: this.sendTx,
 			});
 		},
-		formatConfirmedResponse(
-			response: algosdk.modelsv2.PendingTransactionResponse
-		) {
+		formatConfirmedResponse(response: TxnReceipt) {
 			// for MyAlgo wallet and Wallet Connect the transaction is not formatted like in Algosigner
 			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
 				this.confirmedResponse = formatJSON(response);

@@ -80,6 +80,8 @@ import {
 	formatJSON,
 	prettifyTransaction,
 	convertToBase64,
+	signMultisigUsingMyAlgoWallet,
+	checkAddressPartOfMultisig,
 } from "@/utilities";
 
 export default defineComponent({
@@ -130,23 +132,6 @@ export default defineComponent({
 		setAddresses(value: any) {
 			this.msigAddresses = value;
 		},
-		checkAddress() {
-			if (
-				Array.isArray(this.msigAddresses) &&
-				!this.msigAddresses.find(
-					(item: { address: string; signed: boolean }) =>
-						item.address === this.walletStore.address
-				)
-			) {
-				this.displayError(
-					new Error(
-						"Connected account address is not part of the given multisig transaction."
-					)
-				);
-				return false;
-			}
-			return true;
-		},
 		propsHomeTabChange(value: Tabs) {
 			typeof this.onHomeTabChange === "function" && this.onHomeTabChange(value);
 		},
@@ -161,10 +146,20 @@ export default defineComponent({
 
 			try {
 				if (this.walletStore.walletKind) {
-					if (!this.checkAddress()) return;
+					checkAddressPartOfMultisig(
+						this.msigAddresses,
+						this.walletStore.address
+					);
 					switch (this.walletStore.walletKind) {
 						case WalletType.MY_ALGO: {
-							openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
+							const { base64, json } = await signMultisigUsingMyAlgoWallet(
+								txnBase64
+							);
+							this.contentList.MSG_PACK = base64;
+							this.contentList.JSON = formatJSON(prettifyTransaction(json));
+							this.signed = true;
+							this.key = "JSON";
+							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 							break;
 						}
 						case WalletType.ALGOSIGNER: {
