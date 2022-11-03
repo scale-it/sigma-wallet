@@ -196,9 +196,9 @@ export default defineComponent({
 				this.txInputError = "";
 				try {
 					// decode msgpack to unit8Array
-					const decodedTx = algosdk.decodeSignedTransaction(
+					const decodedTx = algosdk.decodeObj(
 						convertBase64ToUnit8Array(this.txInput)
-					);
+					) as EncodedSignedTransaction;
 					this.txOutput = formatJSON(prettifyTransaction(decodedTx));
 				} catch (error) {
 					this.txInputError = error.message;

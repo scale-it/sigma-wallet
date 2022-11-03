@@ -27,6 +27,9 @@ export function prettifyTransaction(
 	}
 
 	let subsig = formatTransaction.msig?.subsig;
+	if (tx.sgnr) {
+		formatTransaction.sgnr = convertToBase64(tx.sgnr);
+	}
 	// encoding the uint8Array values to base64
 	for (const key in txn) {
 		if (ArrayBuffer.isView(txn[key])) {
