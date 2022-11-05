@@ -90,6 +90,13 @@
 						/>
 					</a-card>
 				</div>
+				<div class="margin_top_med">
+					<a-switch v-model:checked="isChangeFromAddr" />
+					<span class="margin_left_sm"
+						>Update <code>from</code> address with own
+						<code> msig address</code></span
+					>
+				</div>
 				<a-button type="primary" @click="sign" class="margin_top_med"
 					>SIGN</a-button
 				>
@@ -122,23 +129,14 @@
 						:disabled="true"
 					/>
 				</a-card>
-				<MultisigParameters
-					@getAddress="setAddresses"
-					:inputBase64="contentList.MSG_PACK"
-				/>
+				<MultisigParameters :inputBase64="contentList.MSG_PACK" />
 			</a-col>
 		</a-row>
 	</a-layout-content>
 </template>
 
 <script lang="ts">
-import {
-	contentlist,
-	listAddresses,
-	WalletType,
-	Tabs,
-	MultisigAddr,
-} from "@/types";
+import { contentlist, listAddresses, WalletType, Tabs } from "@/types";
 import { defineComponent, ref } from "vue";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
@@ -155,13 +153,18 @@ import {
 import {
 	assertAddrPartOfMultisig,
 	convertBase64ToUint8Array,
+	convertToBase64,
 	formatJSON,
 	prettifyTransaction,
 	signMultisigUsingMyAlgoWallet,
 } from "@/utilities";
 import { WebMode } from "@algo-builder/web";
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
-import algosdk from "algosdk";
+import algosdk, {
+	decodeAddress,
+	decodeUnsignedTransaction,
+	encodeObj,
+} from "algosdk";
 import WalletStore from "@/store/WalletStore";
 import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
 
@@ -206,21 +209,36 @@ export default defineComponent({
 			walletStore,
 			Tabs,
 			msigAddresses: [{}],
+			isChangeFromAddr: false,
 		};
 	},
 	methods: {
-		setAddresses(value: MultisigAddr[]) {
-			this.msigAddresses = value;
-		},
 		propsHomeTabChange(value: Tabs) {
 			typeof this.onHomeTabChange === "function" && this.onHomeTabChange(value);
 		},
 		addAddress() {
-			this.addresses.push({
-				id: id++,
-				address: this.newAddress,
-			});
-			this.newAddress = "";
+			try {
+				// check if address is a valid one
+				if (!this.newAddress.length || !decodeAddress(this.newAddress)) {
+					throw new Error("Please enter a valid address.");
+				}
+				// check if the new address is already added
+				if (
+					this.addresses.findIndex(
+						(item: { address: string; id: number }) =>
+							item.address === this.newAddress
+					) !== -1
+				) {
+					throw new Error("Address already exists.");
+				}
+				this.addresses.push({
+					id: id++,
+					address: this.newAddress,
+				});
+				this.newAddress = "";
+			} catch (error) {
+				this.displayError(error);
+			}
 		},
 		removeAddress(address: listAddresses) {
 			this.addresses = this.addresses.filter((t) => t !== address);
@@ -230,10 +248,10 @@ export default defineComponent({
 			openErrorNotificationWithIcon(error.message);
 		},
 		createMultisig() {
-			let sender = algosdk.decodeUnsignedTransaction(
+			let txn = algosdk.decodeUnsignedTransaction(
 				convertBase64ToUint8Array(this.unsignedInput)
 			);
-			let fromAddr = algosdk.encodeAddress(sender.from.publicKey);
+			let fromAddr = algosdk.encodeAddress(txn.from.publicKey);
 			let addressList = this.addresses.map((x) => {
 				return x.address;
 			});
@@ -247,8 +265,16 @@ export default defineComponent({
 				addrs: addressList,
 			};
 			let multisigaddr = algosdk.multisigAddress(multisigParams);
-			if (fromAddr !== multisigaddr) {
-				openErrorNotificationWithIcon(WRONG_ADDRESS, WRONG_ADDRESSES);
+			// user want to update the from addr with the msig addr
+			if (this.isChangeFromAddr) {
+				txn.from = decodeAddress(multisigaddr);
+				this.unsignedInput = convertToBase64(
+					encodeObj(txn.get_obj_for_encoding())
+				);
+			} else {
+				if (fromAddr != multisigaddr) {
+					openErrorNotificationWithIcon(WRONG_ADDRESS, WRONG_ADDRESSES);
+				}
 			}
 			return multisigParams;
 		},
@@ -256,15 +282,17 @@ export default defineComponent({
 			let txnBase64 = "";
 			txnBase64 = this.unsignedInput;
 			try {
+				const multisigParams = this.createMultisig();
 				if (this.walletStore.walletKind) {
-					assertAddrPartOfMultisig(
-						this.msigAddresses,
-						this.walletStore.address
-					);
+					assertAddrPartOfMultisig(this.addresses, this.walletStore.address);
 					switch (this.walletStore.walletKind) {
 						case WalletType.MY_ALGO: {
+							const txn = decodeUnsignedTransaction(
+								convertBase64ToUint8Array(txnBase64)
+							);
 							const { base64, json } = await signMultisigUsingMyAlgoWallet(
-								txnBase64
+								txnBase64,
+								txn
 							);
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));
@@ -274,7 +302,6 @@ export default defineComponent({
 						}
 						case WalletType.ALGOSIGNER: {
 							let signAlgoSigner = this.walletStore.webMode as WebMode;
-							const multisigParams = this.createMultisig();
 							let signedTxn = await signAlgoSigner.signTransaction([
 								{
 									txn: txnBase64,
@@ -299,7 +326,7 @@ export default defineComponent({
 							break;
 						}
 					}
-				} else throw Error("Please connect your wallet.");
+				} else throw Error(NO_WALLET);
 			} catch (error) {
 				this.displayError(error);
 			}

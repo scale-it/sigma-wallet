@@ -202,7 +202,7 @@ export default defineComponent({
 							break;
 						}
 					}
-				} else throw Error("Please connect your wallet.");
+				} else throw Error(NO_WALLET);
 			} catch (error) {
 				this.displayError(error);
 				console.log(error);
