@@ -152,8 +152,12 @@ export default defineComponent({
 					);
 					switch (this.walletStore.walletKind) {
 						case WalletType.MY_ALGO: {
+							let jsonObject = algosdk.decodeObj(
+								convertBase64ToUnit8Array(txnBase64)
+							) as algosdk.SignedTransaction;
 							const { base64, json } = await signMultisigUsingMyAlgoWallet(
-								txnBase64
+								txnBase64,
+								jsonObject.txn
 							);
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));
