@@ -4,7 +4,10 @@ import algosdk, { encodeObj } from "algosdk";
 import { toRaw } from "vue";
 import { convertBase64ToUnit8Array, convertToBase64 } from "./convert";
 
-export async function signMultisigUsingMyAlgoWallet(txnBase64: string, txn: algosdk.Transaction) {
+export async function signMultisigUsingMyAlgoWallet(
+	txnBase64: string,
+	txn: algosdk.Transaction
+) {
 	const walletStore = WalletStore();
 	const myAlgoMode = walletStore.webMode as MyAlgoWalletSession;
 	const response = await toRaw(myAlgoMode).signTransaction(txn);
@@ -23,4 +26,3 @@ export async function signMultisigUsingMyAlgoWallet(txnBase64: string, txn: algo
 	const outputBase64 = convertToBase64(encodeObj(myAlgoSignedTxn));
 	return { base64: outputBase64, json: myAlgoSignedTxn };
 }
-
