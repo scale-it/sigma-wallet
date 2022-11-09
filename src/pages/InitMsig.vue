@@ -91,15 +91,11 @@
 					</a-card>
 				</div>
 				<div class="margin_top_med">
-					<a-switch v-model:checked="isChangeFromAddr" />
-					<span class="margin_left_sm"
-						>Update <code>from</code> address with own
-						<code> msig address</code></span
+					<a-button type="primary" @click="createMultisig">Create</a-button>
+					<a-button type="primary" @click="sign" class="margin_left_med"
+						>Create And Sign</a-button
 					>
 				</div>
-				<a-button type="primary" @click="sign" class="margin_top_med"
-					>SIGN</a-button
-				>
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
@@ -208,8 +204,6 @@ export default defineComponent({
 			contentList,
 			walletStore,
 			Tabs,
-			msigAddresses: [{}],
-			isChangeFromAddr: false,
 		};
 	},
 	methods: {
@@ -248,35 +242,44 @@ export default defineComponent({
 			openErrorNotificationWithIcon(error.message);
 		},
 		createMultisig() {
-			let txn = algosdk.decodeUnsignedTransaction(
-				convertBase64ToUint8Array(this.unsignedInput)
-			);
-			let fromAddr = algosdk.encodeAddress(txn.from.publicKey);
-			let addressList = this.addresses.map((x) => {
-				return x.address;
-			});
-
-			let version = this.version * 1;
-			let threshold = this.threshold * 1;
-
-			const multisigParams = {
-				version: version,
-				threshold: threshold,
-				addrs: addressList,
-			};
-			let multisigaddr = algosdk.multisigAddress(multisigParams);
-			// user want to update the from addr with the msig addr
-			if (this.isChangeFromAddr) {
-				txn.from = decodeAddress(multisigaddr);
-				this.unsignedInput = convertToBase64(
-					encodeObj(txn.get_obj_for_encoding())
+			try {
+				let txn = algosdk.decodeUnsignedTransaction(
+					convertBase64ToUint8Array(this.unsignedInput)
 				);
-			} else {
-				if (fromAddr != multisigaddr) {
-					openErrorNotificationWithIcon(WRONG_ADDRESS, WRONG_ADDRESSES);
+				let addr = this.addresses.map((x) => {
+					return x.address;
+				});
+
+				if (!addr.length) {
+					throw new Error("Please add your addresses to create a msig addr.");
 				}
+
+				let version = this.version * 1;
+				let threshold = this.threshold * 1;
+
+				const multisigParams = {
+					version: version,
+					threshold: threshold,
+					addrs: addr,
+				};
+				let multisigaddr = algosdk.multisigAddress(multisigParams);
+				// user want to update the from addr with the msig addr
+				txn.from = decodeAddress(multisigaddr);
+				let subsig = [];
+				for (const address of addr) {
+					subsig.push({ pk: decodeAddress(address).publicKey });
+				}
+				const msigTxn = {
+					msig: { v: version, thr: threshold, subsig: subsig },
+					txn: txn,
+				};
+
+				this.contentList.MSG_PACK = convertToBase64(encodeObj(msigTxn));
+				this.contentList.JSON = formatJSON(prettifyTransaction(msigTxn));
+				return multisigParams;
+			} catch (error) {
+				this.displayError(error);
 			}
-			return multisigParams;
 		},
 		async sign() {
 			let txnBase64 = "";
