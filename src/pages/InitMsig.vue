@@ -91,7 +91,7 @@
 					</a-card>
 				</div>
 				<div class="margin_top_med">
-					<a-button type="primary" @click="createMultisig">Create</a-button>
+					<a-button type="primary" @click="handleCreateTxn">Create</a-button>
 					<a-button type="primary" @click="sign" class="margin_left_med"
 						>Create And Sign</a-button
 					>
@@ -143,6 +143,7 @@ import {
 	WALLET_NOT_SUPPORTED,
 	openSuccessNotificationWithIcon,
 	SIGN_SUCCESSFUL,
+	TXN_CREATED_SUCCESSFUL,
 } from "@/constants";
 import {
 	assertAddrPartOfMultisig,
@@ -150,15 +151,10 @@ import {
 	convertToBase64,
 	formatJSON,
 	prettifyTransaction,
+	signMultisigUsingAlgosigner,
 	signMultisigUsingMyAlgoWallet,
 } from "@/utilities";
-import { WebMode } from "@algo-builder/web";
-import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
-import algosdk, {
-	decodeAddress,
-	decodeUnsignedTransaction,
-	encodeObj,
-} from "algosdk";
+import algosdk, { decodeAddress, encodeObj } from "algosdk";
 import WalletStore from "@/store/WalletStore";
 import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
 
@@ -202,9 +198,15 @@ export default defineComponent({
 			contentList,
 			walletStore,
 			Tabs,
+			createTxn: false,
+			createdMsigTxnBase64: "",
 		};
 	},
 	methods: {
+		handleCreateTxn() {
+			this.createTxn = true;
+			this.createMultisig();
+		},
 		propsHomeTabChange(value: Tabs) {
 			typeof this.onHomeTabChange === "function" && this.onHomeTabChange(value);
 		},
@@ -251,6 +253,11 @@ export default defineComponent({
 				if (!addr.length) {
 					throw new Error("Please add your addresses to create a msig addr.");
 				}
+				if (this.addresses.length <= 1) {
+					throw new Error(
+						"Please add more address to form your multisig address."
+					);
+				}
 
 				let version = this.version * 1;
 				let threshold = this.threshold * 1;
@@ -269,32 +276,37 @@ export default defineComponent({
 				}
 				const msigTxn = {
 					msig: { v: version, thr: threshold, subsig: subsig },
-					txn: txn,
+					txn: txn.get_obj_for_encoding(),
 				};
-
-				this.contentList.MSG_PACK = convertToBase64(encodeObj(msigTxn));
-				this.contentList.JSON = formatJSON(prettifyTransaction(msigTxn));
-				this.key = "MSG_PACK";
+				// display created msig txn in output preview (if create txn is clicked)
+				if (this.createTxn) {
+					this.contentList.MSG_PACK = convertToBase64(encodeObj(msigTxn));
+					this.contentList.JSON = formatJSON(prettifyTransaction(msigTxn));
+					this.key = "MSG_PACK";
+					openSuccessNotificationWithIcon(TXN_CREATED_SUCCESSFUL);
+				}
+				this.createdMsigTxnBase64 = convertToBase64(encodeObj(msigTxn));
 				return multisigParams;
 			} catch (error) {
 				this.displayError(error);
 			}
 		},
 		async sign() {
-			let txnBase64 = "";
-			txnBase64 = this.unsignedInput;
+			this.createTxn = false;
 			try {
-				const multisigParams = this.createMultisig();
 				if (this.walletStore.walletKind) {
 					assertAddrPartOfMultisig(this.addresses, this.walletStore.address);
+					const multisigParams = this.createMultisig();
+					let txnBase64 = "";
+					txnBase64 = this.createdMsigTxnBase64;
 					switch (this.walletStore.walletKind) {
 						case WalletType.MY_ALGO: {
-							const txn = decodeUnsignedTransaction(
+							let jsonObject = algosdk.decodeObj(
 								convertBase64ToUint8Array(txnBase64)
-							);
+							) as algosdk.SignedTransaction;
 							const { base64, json } = await signMultisigUsingMyAlgoWallet(
 								txnBase64,
-								txn
+								jsonObject.txn
 							);
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));
@@ -303,20 +315,17 @@ export default defineComponent({
 							break;
 						}
 						case WalletType.ALGOSIGNER: {
-							let signAlgoSigner = this.walletStore.webMode as WebMode;
-							let signedTxn = await signAlgoSigner.signTransaction([
-								{
-									txn: txnBase64,
-									msig: multisigParams,
-								},
-							]);
-							const json = signedTxn[0] as JsonPayload;
-							this.contentList.MSG_PACK = json.blob as string;
-							const arr = convertBase64ToUint8Array(this.contentList.MSG_PACK);
-							const newJson = algosdk.decodeSignedTransaction(arr);
-							this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
-							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
+							if (!multisigParams) {
+								return;
+							}
+							const { base64, json } = await signMultisigUsingAlgosigner(
+								txnBase64,
+								multisigParams
+							);
+							this.contentList.MSG_PACK = base64;
+							this.contentList.JSON = formatJSON(prettifyTransaction(json));
 							this.key = "MSG_PACK";
+							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 							break;
 						}
 						case WalletType.WALLET_CONNECT: {

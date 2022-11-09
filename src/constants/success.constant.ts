@@ -32,3 +32,4 @@ export const TRANSACTION_SEND_SUCCESSFUL =
 	"Your Transaction is sent successfully";
 
 export const SIGN_SUCCESSFUL = "Your transaction is signed successfully";
+export const TXN_CREATED_SUCCESSFUL = "Your multisignature transaction is created successfully";

@@ -141,7 +141,6 @@ export default defineComponent({
 		async sign() {
 			let txnBase64 = "";
 			txnBase64 = this.unsignedJson;
-
 			try {
 				if (this.walletStore.walletKind) {
 					assertAddrPartOfMultisig(
