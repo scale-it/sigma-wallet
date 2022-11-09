@@ -82,6 +82,7 @@ import {
 	convertToBase64,
 	signMultisigUsingMyAlgoWallet,
 	checkAddressPartOfMultisig,
+	signMultisigUsingAlgosigner,
 } from "@/utilities";
 
 export default defineComponent({
@@ -167,21 +168,9 @@ export default defineComponent({
 							break;
 						}
 						case WalletType.ALGOSIGNER: {
-							let signAlgoSigner = this.walletStore.webMode as WebMode;
 							let jsonObject = algosdk.decodeObj(
 								convertBase64ToUnit8Array(txnBase64)
 							) as algosdk.EncodedSignedTransaction;
-							if (jsonObject.txn === undefined) {
-								openErrorNotificationWithIcon(
-									"Input transaction must be multisigature transaction signed by at least 1 address."
-								);
-								break;
-							}
-							let msig = algosdk.Transaction.from_obj_for_encoding(
-								jsonObject.txn
-							);
-							const bytes = algosdk.encodeObj(msig.get_obj_for_encoding());
-							const txnBase64Signing = convertToBase64(bytes); // base64 of the transaction without signature
 							const mparams = jsonObject.msig as algosdk.EncodedMultisig; // get information from subsig
 
 							const version = mparams.v;
@@ -196,28 +185,12 @@ export default defineComponent({
 								threshold: threshold,
 								addrs: addr,
 							};
-
-							signedTxn = await signAlgoSigner.signTransaction([
-								{
-									txn: txnBase64Signing,
-									msig: multisigParams,
-								},
-							]);
-							const json = signedTxn[0] as JsonPayload;
-							const blob = json.blob as string;
-
-							const blob1 = convertBase64ToUnit8Array(txnBase64);
-							const blob2 = convertBase64ToUnit8Array(blob);
-							const combineBlob = algosdk.mergeMultisigTransactions([
-								blob1,
-								blob2,
-							]);
-
-							const outputBase64 = convertToBase64(combineBlob);
-							this.contentList.MSG_PACK = outputBase64;
-
-							const newJson = algosdk.decodeSignedTransaction(combineBlob);
-							this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
+							const { base64, json } = await signMultisigUsingAlgosigner(
+								txnBase64,
+								multisigParams
+							);
+							this.contentList.MSG_PACK = base64;
+							this.contentList.JSON = formatJSON(prettifyTransaction(json));
 							this.signed = true;
 							this.key = "JSON";
 							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
