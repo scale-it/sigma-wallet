@@ -31,18 +31,18 @@ export async function signMultisigUsingMyAlgoWallet(
 export async function signMultisigUsingAlgosigner(txnBase64: string,
 	multisigParams: WalletMultisigMetadata) {
 	const walletStore = WalletStore();
-	let signAlgoSigner = walletStore.webMode as WebMode;
-	let jsonObject = algosdk.decodeObj(
+	const signAlgoSigner = walletStore.webMode as WebMode;
+	const jsonObject = algosdk.decodeObj(
 		convertBase64ToUnit8Array(txnBase64)
 	) as algosdk.EncodedSignedTransaction;
 
-	let msig = algosdk.Transaction.from_obj_for_encoding(
+	const msig = algosdk.Transaction.from_obj_for_encoding(
 		jsonObject.txn
 	);
 	const bytes = algosdk.encodeObj(msig.get_obj_for_encoding());
 	const txnBase64Signing = convertToBase64(bytes); // base64 of the transaction without signature
 
-	let signedTxn = await signAlgoSigner.signTransaction([
+	const signedTxn = await signAlgoSigner.signTransaction([
 		{
 			txn: txnBase64Signing,
 			msig: multisigParams,
