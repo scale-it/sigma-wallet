@@ -160,7 +160,7 @@ export default defineComponent({
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));
 							this.signed = true;
-							this.key = "JSON";
+							this.key = "MSG_PACK";
 							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 							break;
 						}
@@ -189,7 +189,7 @@ export default defineComponent({
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));
 							this.signed = true;
-							this.key = "JSON";
+							this.key = "MSG_PACK";
 							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 							break;
 						}

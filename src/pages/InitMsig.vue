@@ -139,8 +139,6 @@ import {
 	errorMessage,
 	openErrorNotificationWithIcon,
 	tabList,
-	WRONG_ADDRESS,
-	WRONG_ADDRESSES,
 	NO_WALLET,
 	WALLET_NOT_SUPPORTED,
 	openSuccessNotificationWithIcon,
@@ -276,6 +274,7 @@ export default defineComponent({
 
 				this.contentList.MSG_PACK = convertToBase64(encodeObj(msigTxn));
 				this.contentList.JSON = formatJSON(prettifyTransaction(msigTxn));
+				this.key = "MSG_PACK";
 				return multisigParams;
 			} catch (error) {
 				this.displayError(error);
@@ -299,7 +298,7 @@ export default defineComponent({
 							);
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));
-							this.key = "JSON";
+							this.key = "MSG_PACK";
 							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 							break;
 						}
@@ -317,7 +316,7 @@ export default defineComponent({
 							const newJson = algosdk.decodeSignedTransaction(arr);
 							this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
 							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
-							this.key = "JSON";
+							this.key = "MSG_PACK";
 							break;
 						}
 						case WalletType.WALLET_CONNECT: {
