@@ -28,4 +28,4 @@ export const WRONG_ADDRESSES =
 
 export const NO_WALLET = "You need to login your wallet to sign transaction!";
 export const NOT_SUPPORT_WALLET =
-	"We are currently unable to support MyAlgo and Wallet Connect to sign multisigature transaction";
+	"We are currently unable to support Wallet Connect to sign multisigature transaction";
