@@ -72,7 +72,6 @@ import {
 	SIGN_SUCCESSFUL,
 	tabList,
 } from "@/constants";
-import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
 	convertBase64ToUint8Array,
