@@ -1,4 +1,4 @@
-export function checkAddressPartOfMultisig(
+export function assertAddrPartOfMultisig(
 	multisigAddress: any[],
 	address: string
 ) {

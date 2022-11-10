@@ -62,8 +62,7 @@
 import WalletStore from "@/store/WalletStore";
 import algosdk, { Transaction } from "algosdk";
 import { defineComponent, reactive, toRefs, ref } from "vue";
-import { WebMode } from "@algo-builder/web";
-import { WalletType, contentlist, Tabs } from "@/types";
+import { WalletType, contentlist, Tabs, MultisigAddr } from "@/types";
 import {
 	errorMessage,
 	NOT_SUPPORT_WALLET,
@@ -76,12 +75,11 @@ import {
 import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
-	convertBase64ToUnit8Array,
+	convertBase64ToUint8Array,
 	formatJSON,
 	prettifyTransaction,
-	convertToBase64,
 	signMultisigUsingMyAlgoWallet,
-	checkAddressPartOfMultisig,
+	assertAddrPartOfMultisig,
 	signMultisigUsingAlgosigner,
 } from "@/utilities";
 
@@ -126,11 +124,11 @@ export default defineComponent({
 			key,
 			onTabChange,
 			Tabs,
-			msigAddresses: [],
+			msigAddresses: [{}],
 		};
 	},
 	methods: {
-		setAddresses(value: any) {
+		setAddresses(value: MultisigAddr[]) {
 			this.msigAddresses = value;
 		},
 		propsHomeTabChange(value: Tabs) {
@@ -142,19 +140,18 @@ export default defineComponent({
 		},
 		async sign() {
 			let txnBase64 = "";
-			let signedTxn: JsonPayload;
 			txnBase64 = this.unsignedJson;
 
 			try {
 				if (this.walletStore.walletKind) {
-					checkAddressPartOfMultisig(
+					assertAddrPartOfMultisig(
 						this.msigAddresses,
 						this.walletStore.address
 					);
 					switch (this.walletStore.walletKind) {
 						case WalletType.MY_ALGO: {
 							let jsonObject = algosdk.decodeObj(
-								convertBase64ToUnit8Array(txnBase64)
+								convertBase64ToUint8Array(txnBase64)
 							) as algosdk.SignedTransaction;
 							const { base64, json } = await signMultisigUsingMyAlgoWallet(
 								txnBase64,
@@ -169,7 +166,7 @@ export default defineComponent({
 						}
 						case WalletType.ALGOSIGNER: {
 							let jsonObject = algosdk.decodeObj(
-								convertBase64ToUnit8Array(txnBase64)
+								convertBase64ToUint8Array(txnBase64)
 							) as algosdk.EncodedSignedTransaction;
 							const mparams = jsonObject.msig as algosdk.EncodedMultisig; // get information from subsig
 

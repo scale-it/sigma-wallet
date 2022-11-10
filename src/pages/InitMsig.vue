@@ -132,7 +132,13 @@
 </template>
 
 <script lang="ts">
-import { contentlist, listAddresses, WalletType, Tabs } from "@/types";
+import {
+	contentlist,
+	listAddresses,
+	WalletType,
+	Tabs,
+	MultisigAddr,
+} from "@/types";
 import { defineComponent, ref } from "vue";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
@@ -147,8 +153,8 @@ import {
 	SIGN_SUCCESSFUL,
 } from "@/constants";
 import {
-	checkAddressPartOfMultisig,
-	convertBase64ToUnit8Array,
+	assertAddrPartOfMultisig,
+	convertBase64ToUint8Array,
 	formatJSON,
 	prettifyTransaction,
 	signMultisigUsingMyAlgoWallet,
@@ -199,11 +205,11 @@ export default defineComponent({
 			contentList,
 			walletStore,
 			Tabs,
-			msigAddresses: [],
+			msigAddresses: [{}],
 		};
 	},
 	methods: {
-		setAddresses(value: any) {
+		setAddresses(value: MultisigAddr[]) {
 			this.msigAddresses = value;
 		},
 		propsHomeTabChange(value: Tabs) {
@@ -225,10 +231,10 @@ export default defineComponent({
 		},
 		createMultisig() {
 			let sender = algosdk.decodeUnsignedTransaction(
-				convertBase64ToUnit8Array(this.unsignedInput)
+				convertBase64ToUint8Array(this.unsignedInput)
 			);
 			let fromAddr = algosdk.encodeAddress(sender.from.publicKey);
-			let addr = this.addresses.map((x) => {
+			let addressList = this.addresses.map((x) => {
 				return x.address;
 			});
 
@@ -238,7 +244,7 @@ export default defineComponent({
 			const multisigParams = {
 				version: version,
 				threshold: threshold,
-				addrs: addr,
+				addrs: addressList,
 			};
 			let multisigaddr = algosdk.multisigAddress(multisigParams);
 			if (fromAddr != multisigaddr) {
@@ -251,7 +257,7 @@ export default defineComponent({
 			txnBase64 = this.unsignedInput;
 			try {
 				if (this.walletStore.walletKind) {
-					checkAddressPartOfMultisig(
+					assertAddrPartOfMultisig(
 						this.msigAddresses,
 						this.walletStore.address
 					);
@@ -277,7 +283,7 @@ export default defineComponent({
 							]);
 							const json = signedTxn[0] as JsonPayload;
 							this.contentList.MSG_PACK = json.blob as string;
-							const arr = convertBase64ToUnit8Array(this.contentList.MSG_PACK);
+							const arr = convertBase64ToUint8Array(this.contentList.MSG_PACK);
 							const newJson = algosdk.decodeSignedTransaction(arr);
 							this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
 							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);

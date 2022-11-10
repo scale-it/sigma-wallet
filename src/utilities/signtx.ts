@@ -6,7 +6,7 @@ import {
 } from "@algo-builder/web/build/algo-signer-types";
 import algosdk, { encodeObj } from "algosdk";
 import { toRaw } from "vue";
-import { convertBase64ToUnit8Array, convertToBase64 } from "./convert";
+import { convertBase64ToUint8Array, convertToBase64 } from "./convert";
 
 export async function signMultisigUsingMyAlgoWallet(
 	txnBase64: string,
@@ -15,7 +15,7 @@ export async function signMultisigUsingMyAlgoWallet(
 	const walletStore = WalletStore();
 	const myAlgoMode = walletStore.webMode as MyAlgoWalletSession;
 	const response = await toRaw(myAlgoMode).signTransaction(txn);
-	const blob1 = convertBase64ToUnit8Array(txnBase64);
+	const blob1 = convertBase64ToUint8Array(txnBase64);
 	const blob2 = response.blob;
 	const initialSignedMsig = algosdk.decodeSignedTransaction(blob1).msig;
 	// merging initial signed sk key to new signed txn object (returned from myAlgo wallet)
@@ -38,7 +38,7 @@ export async function signMultisigUsingAlgosigner(
 	const walletStore = WalletStore();
 	const signAlgoSigner = walletStore.webMode as WebMode;
 	const jsonObject = algosdk.decodeObj(
-		convertBase64ToUnit8Array(txnBase64)
+		convertBase64ToUint8Array(txnBase64)
 	) as algosdk.EncodedSignedTransaction;
 
 	const msig = algosdk.Transaction.from_obj_for_encoding(jsonObject.txn);
@@ -56,8 +56,8 @@ export async function signMultisigUsingAlgosigner(
 	let combineBlob = encodeObj(json.blob as any);
 	// we have multiple signatures
 	if (jsonObject.msig?.subsig.findIndex((item) => item.s?.length) !== -1) {
-		const blob1 = convertBase64ToUnit8Array(txnBase64);
-		const blob2 = convertBase64ToUnit8Array(json.blob as string);
+		const blob1 = convertBase64ToUint8Array(txnBase64);
+		const blob2 = convertBase64ToUint8Array(json.blob as string);
 		combineBlob = algosdk.mergeMultisigTransactions([blob1, blob2]);
 	}
 

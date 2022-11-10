@@ -75,7 +75,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import WalletStore from "@/store/WalletStore";
 import {
-	convertBase64ToUnit8Array,
+	convertBase64ToUint8Array,
 	formatJSON,
 	prettifyTransaction,
 } from "@/utilities";
@@ -150,10 +150,10 @@ export default defineComponent({
 			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
 				encodedTx = this.txInput as string;
 			} else {
-				encodedTx = convertBase64ToUnit8Array(this.txInput);
+				encodedTx = convertBase64ToUint8Array(this.txInput);
 			}
 			const decodedTxn = decodeObj(
-				convertBase64ToUnit8Array(this.txInput)
+				convertBase64ToUint8Array(this.txInput)
 			) as EncodedSignedTransaction;
 
 			const txID = algosdk.Transaction.from_obj_for_encoding(
@@ -197,7 +197,7 @@ export default defineComponent({
 				try {
 					// decode msgpack to unit8Array
 					const decodedTx = algosdk.decodeObj(
-						convertBase64ToUnit8Array(this.txInput)
+						convertBase64ToUint8Array(this.txInput)
 					) as EncodedSignedTransaction;
 					this.txOutput = formatJSON(prettifyTransaction(decodedTx));
 				} catch (error) {

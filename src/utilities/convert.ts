@@ -3,7 +3,8 @@ import {
 	EncodedSignedTransaction,
 	SignedTransaction,
 } from "algosdk";
-export function convertBase64ToUnit8Array(input: string): Uint8Array {
+
+export function convertBase64ToUint8Array(input: string): Uint8Array {
 	return Uint8Array.from(Buffer.from(input, "base64"));
 }
 
