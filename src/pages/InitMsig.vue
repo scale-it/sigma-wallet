@@ -247,7 +247,7 @@ export default defineComponent({
 				addrs: addressList,
 			};
 			let multisigaddr = algosdk.multisigAddress(multisigParams);
-			if (fromAddr != multisigaddr) {
+			if (fromAddr !== multisigaddr) {
 				openErrorNotificationWithIcon(WRONG_ADDRESS, WRONG_ADDRESSES);
 			}
 			return multisigParams;
