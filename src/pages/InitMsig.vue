@@ -148,7 +148,7 @@ import {
 	WRONG_ADDRESS,
 	WRONG_ADDRESSES,
 	NO_WALLET,
-	NOT_SUPPORT_WALLET,
+	WALLET_NOT_SUPPORTED,
 	openSuccessNotificationWithIcon,
 	SIGN_SUCCESSFUL,
 } from "@/constants";
@@ -291,7 +291,7 @@ export default defineComponent({
 							break;
 						}
 						case WalletType.WALLET_CONNECT: {
-							openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
+							openErrorNotificationWithIcon(WALLET_NOT_SUPPORTED);
 							break;
 						}
 						default: {

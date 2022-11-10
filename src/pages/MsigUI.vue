@@ -65,7 +65,7 @@ import { defineComponent, reactive, toRefs, ref } from "vue";
 import { WalletType, contentlist, Tabs, MultisigAddr } from "@/types";
 import {
 	errorMessage,
-	NOT_SUPPORT_WALLET,
+	WALLET_NOT_SUPPORTED,
 	NO_WALLET,
 	openErrorNotificationWithIcon,
 	openSuccessNotificationWithIcon,
@@ -194,7 +194,7 @@ export default defineComponent({
 							break;
 						}
 						case WalletType.WALLET_CONNECT: {
-							openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
+							openErrorNotificationWithIcon(WALLET_NOT_SUPPORTED);
 							break;
 						}
 						default: {
