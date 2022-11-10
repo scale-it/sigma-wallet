@@ -15,6 +15,6 @@ export type listAddresses = {
 };
 
 export type MultisigAddr = {
-	address: string
-	signed: boolean
-}
+	address: string;
+	signed: boolean;
+};
