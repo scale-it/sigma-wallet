@@ -114,7 +114,7 @@ import {
 	walletMessage,
 } from "@/constants";
 import { port, server, token } from "@/config/algob.config";
-import { HttpNetworkConfig } from "@algo-builder/web/build/types";
+import { types } from "@algo-builder/web";
 declare var AlgoSigner: any; // eslint-disable-line
 
 export default defineComponent({
@@ -141,7 +141,7 @@ export default defineComponent({
 		};
 	},
 	methods: {
-		getWalletUrlConfig(networkType: NetworkTypes): HttpNetworkConfig {
+		getWalletUrlConfig(networkType: NetworkTypes): types.HttpNetworkConfig {
 			switch (networkType) {
 				case NetworkTypes.MAIN_NET:
 					return {

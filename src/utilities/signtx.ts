@@ -1,9 +1,6 @@
 import WalletStore from "@/store/WalletStore";
+import { JsonPayload, WalletMultisigMetadata } from "@/types";
 import { MyAlgoWalletSession, WebMode } from "@algo-builder/web";
-import {
-	JsonPayload,
-	WalletMultisigMetadata,
-} from "@algo-builder/web/build/algo-signer-types";
 import algosdk, { EncodedTransaction, encodeObj, Transaction } from "algosdk";
 import { toRaw } from "vue";
 import { convertBase64ToUint8Array, convertToBase64 } from "./convert";
