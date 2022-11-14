@@ -4,7 +4,7 @@ export type contentlist = {
 };
 
 export type MultisignatureParam = {
-	addresses: { address: string; signed: boolean }[];
+	addresses: MultisigAddr[];
 	threshold: number;
 	version: number;
 };
@@ -12,4 +12,9 @@ export type MultisignatureParam = {
 export type listAddresses = {
 	id: number;
 	address: string;
+};
+
+export type MultisigAddr = {
+	address: string;
+	signed: boolean;
 };

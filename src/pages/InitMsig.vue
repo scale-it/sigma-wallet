@@ -9,7 +9,7 @@
 					<a
 						href="https://algorand.github.io/js-algorand-sdk/classes/Transaction.html"
 						target="_blank"
-						>algosdk.Transaction</a
+						>Transaction</a
 					>
 					in base64 Msgpack.
 				</p>
@@ -90,15 +90,19 @@
 						/>
 					</a-card>
 				</div>
-				<a-button type="primary" @click="sign" class="margin_top_med"
-					>SIGN</a-button
-				>
+				<div class="margin_top_med">
+					<a-button type="primary" @click="handleCreateTxn">Create</a-button>
+					<a-button type="primary" @click="sign" class="margin_left_med"
+						>Create And Sign</a-button
+					>
+				</div>
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
 				<p>
-					This is the preview of a new multisigature transaction created using
-					the parameters you provided in left column. You can sign it in the
+					This is the preview of a new multisigature Signed Encoded Transaction
+					created using the parameters you provided in left column. You can sign
+					it in the
 					<a @click="propsHomeTabChange(Tabs.Msig)">MultiSig</a> Tab.
 				</p>
 				<a-card
@@ -136,25 +140,24 @@ import {
 	errorMessage,
 	openErrorNotificationWithIcon,
 	tabList,
-	WRONG_ADDRESS,
-	WRONG_ADDRESSES,
 	NO_WALLET,
-	NOT_SUPPORT_WALLET,
+	WALLET_NOT_SUPPORTED,
 	openSuccessNotificationWithIcon,
 	SIGN_SUCCESSFUL,
+	TXN_CREATED_SUCCESSFUL,
 } from "@/constants";
 import {
-	convertBase64ToUnit8Array,
+	assertAddrPartOfMultisig,
+	convertBase64ToUint8Array,
+	convertToBase64,
 	formatJSON,
 	prettifyTransaction,
+	signMultisigUsingAlgosigner,
+	signMultisigUsingMyAlgoWallet,
 } from "@/utilities";
-import { WebMode } from "@algo-builder/web";
-import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
-import algosdk from "algosdk";
+import algosdk, { decodeAddress, encodeObj } from "algosdk";
 import WalletStore from "@/store/WalletStore";
 import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
-
-let id = 0;
 
 export default defineComponent({
 	name: "MsigTx Creator",
@@ -186,26 +189,50 @@ export default defineComponent({
 			unsignedInput: "",
 			addresses,
 			newAddress: "",
-			version: 0,
-			threshold: 0,
+			version: 1,
+			threshold: 1,
 			key,
 			onTabChange,
 			tabList,
 			contentList,
 			walletStore,
 			Tabs,
+			createTxn: false,
+			createdMsigTxnBase64: "",
+			id: 0,
 		};
 	},
 	methods: {
+		handleCreateTxn() {
+			this.createTxn = true;
+			this.createMultisig();
+		},
 		propsHomeTabChange(value: Tabs) {
 			typeof this.onHomeTabChange === "function" && this.onHomeTabChange(value);
 		},
 		addAddress() {
-			this.addresses.push({
-				id: id++,
-				address: this.newAddress,
-			});
-			this.newAddress = "";
+			try {
+				// check if address is a valid one
+				if (!this.newAddress.length || !decodeAddress(this.newAddress)) {
+					throw new Error("Please enter a valid address.");
+				}
+				// check if the new address is already added
+				if (
+					this.addresses.findIndex(
+						(item: { address: string; id: number }) =>
+							item.address === this.newAddress
+					) !== -1
+				) {
+					throw new Error("Address already exists.");
+				}
+				this.addresses.push({
+					id: this.id++,
+					address: this.newAddress,
+				});
+				this.newAddress = "";
+			} catch (error) {
+				this.displayError(error);
+			}
 		},
 		removeAddress(address: listAddresses) {
 			this.addresses = this.addresses.filter((t) => t !== address);
@@ -214,63 +241,104 @@ export default defineComponent({
 			errorMessage(this.key);
 			openErrorNotificationWithIcon(error.message);
 		},
-		async sign() {
-			let txnBase64 = "";
-			txnBase64 = this.unsignedInput;
+		createMultisig() {
 			try {
-				switch (this.walletStore.walletKind) {
-					case WalletType.MY_ALGO: {
-						openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
-						break;
-					}
-					case WalletType.ALGOSIGNER: {
-						let signAlgoSigner = this.walletStore.webMode as WebMode;
+				let txn = algosdk.decodeUnsignedTransaction(
+					convertBase64ToUint8Array(this.unsignedInput)
+				);
+				let addr = this.addresses.map((x) => {
+					return x.address;
+				});
 
-						let sender = algosdk.decodeUnsignedTransaction(
-							convertBase64ToUnit8Array(txnBase64)
-						);
-						let fromAddr = algosdk.encodeAddress(sender.from.publicKey);
-						let addr = this.addresses.map((x) => {
-							return x.address;
-						});
+				if (!addr.length) {
+					throw new Error("Please add your addresses to create a msig addr.");
+				}
+				if (this.addresses.length <= 1) {
+					throw new Error(
+						"Please add more address to form your multisig address."
+					);
+				}
 
-						let version = this.version * 1;
-						let threshold = this.threshold * 1;
+				let version = +this.version;
+				let threshold = +this.threshold;
 
-						const multisigParams = {
-							version: version,
-							threshold: threshold,
-							addrs: addr,
-						};
-						let multisigaddr = algosdk.multisigAddress(multisigParams);
-						if (fromAddr != multisigaddr) {
-							openErrorNotificationWithIcon(WRONG_ADDRESS, WRONG_ADDRESSES);
+				const multisigParams = {
+					version: version,
+					threshold: threshold,
+					addrs: addr,
+				};
+				let multisigaddr = algosdk.multisigAddress(multisigParams);
+				// user want to update the from addr with the msig addr
+				txn.from = decodeAddress(multisigaddr);
+				let subsig = [];
+				for (const address of addr) {
+					subsig.push({ pk: decodeAddress(address).publicKey });
+				}
+				const msigTxn = {
+					msig: { v: version, thr: threshold, subsig: subsig },
+					txn: txn.get_obj_for_encoding(),
+				};
+				const base64 = convertToBase64(encodeObj(msigTxn));
+				// display created msig txn in output preview (if create txn is clicked)
+				if (this.createTxn) {
+					this.contentList.MSG_PACK = base64;
+					this.contentList.JSON = formatJSON(prettifyTransaction(msigTxn));
+					this.key = "MSG_PACK";
+					openSuccessNotificationWithIcon(TXN_CREATED_SUCCESSFUL);
+				}
+				this.createdMsigTxnBase64 = base64;
+				return multisigParams;
+			} catch (error) {
+				this.displayError(error);
+			}
+		},
+		async sign() {
+			this.createTxn = false;
+			try {
+				if (this.walletStore.walletKind) {
+					assertAddrPartOfMultisig(this.addresses, this.walletStore.address);
+					const multisigParams = this.createMultisig();
+					let txnBase64 = "";
+					txnBase64 = this.createdMsigTxnBase64;
+					switch (this.walletStore.walletKind) {
+						case WalletType.MY_ALGO: {
+							let jsonObject = algosdk.decodeObj(
+								convertBase64ToUint8Array(txnBase64)
+							) as algosdk.SignedTransaction;
+							const { base64, json } = await signMultisigUsingMyAlgoWallet(
+								txnBase64,
+								jsonObject.txn
+							);
+							this.contentList.MSG_PACK = base64;
+							this.contentList.JSON = formatJSON(prettifyTransaction(json));
+							this.key = "MSG_PACK";
+							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 							break;
 						}
-						let signedTxn = await signAlgoSigner.signTransaction([
-							{
-								txn: txnBase64,
-								msig: multisigParams,
-							},
-						]);
-						const json = signedTxn[0] as JsonPayload;
-						this.contentList.MSG_PACK = json.blob as string;
-						const arr = convertBase64ToUnit8Array(this.contentList.MSG_PACK);
-						const newJson = algosdk.decodeSignedTransaction(arr);
-						this.contentList.JSON = formatJSON(prettifyTransaction(newJson));
-						openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
-						this.key = "JSON";
-						break;
+						case WalletType.ALGOSIGNER: {
+							if (!multisigParams) {
+								return;
+							}
+							const { base64, json } = await signMultisigUsingAlgosigner(
+								txnBase64,
+								multisigParams
+							);
+							this.contentList.MSG_PACK = base64;
+							this.contentList.JSON = formatJSON(prettifyTransaction(json));
+							this.key = "MSG_PACK";
+							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
+							break;
+						}
+						case WalletType.WALLET_CONNECT: {
+							openErrorNotificationWithIcon(WALLET_NOT_SUPPORTED);
+							break;
+						}
+						default: {
+							openErrorNotificationWithIcon(NO_WALLET);
+							break;
+						}
 					}
-					case WalletType.WALLET_CONNECT: {
-						openErrorNotificationWithIcon(NOT_SUPPORT_WALLET);
-						break;
-					}
-					default: {
-						openErrorNotificationWithIcon(NO_WALLET);
-						break;
-					}
-				}
+				} else throw Error(NO_WALLET);
 			} catch (error) {
 				this.displayError(error);
 			}

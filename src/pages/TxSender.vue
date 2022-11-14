@@ -4,8 +4,13 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
 				<h2>Transaction Input</h2>
 				<p>
-					Add a transaction in base64 Msgpack format and send it to the Algorand
-					blockchain.
+					Add a
+					<a
+						href="https://algorand.github.io/js-algorand-sdk/interfaces/EncodedSignedTransaction.html"
+						target="_blank"
+						>Encoded Signed Transaction
+					</a>
+					in base64 Msgpack format and send it to the Algorand blockchain.
 				</p>
 				<a-textarea
 					placeholder="Base64 msgpack"
@@ -27,7 +32,9 @@
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
 				<h2>Transaction preview</h2>
-				<p>This is the preview of your signed transaction in JSON format.</p>
+				<p>
+					This is the preview of your Encoded Signed Transaction in JSON format.
+				</p>
 				<a-textarea
 					class="text_area"
 					:style="txOutput.length"
@@ -75,7 +82,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import WalletStore from "@/store/WalletStore";
 import {
-	convertBase64ToUnit8Array,
+	convertBase64ToUint8Array,
 	formatJSON,
 	prettifyTransaction,
 } from "@/utilities";
@@ -94,6 +101,7 @@ import {
 	WallectConnectSession,
 	WebMode,
 } from "@algo-builder/web";
+import { types } from "@algo-builder/web";
 
 export default defineComponent({
 	data() {
@@ -124,9 +132,7 @@ export default defineComponent({
 				onOk: this.sendTx,
 			});
 		},
-		formatConfirmedResponse(
-			response: algosdk.modelsv2.PendingTransactionResponse
-		) {
+		formatConfirmedResponse(response: types.TxnReceipt) {
 			// for MyAlgo wallet and Wallet Connect the transaction is not formatted like in Algosigner
 			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
 				this.confirmedResponse = formatJSON(response);
@@ -151,10 +157,10 @@ export default defineComponent({
 			if (this.walletStore.walletKind === WalletType.ALGOSIGNER) {
 				encodedTx = this.txInput as string;
 			} else {
-				encodedTx = convertBase64ToUnit8Array(this.txInput);
+				encodedTx = convertBase64ToUint8Array(this.txInput);
 			}
 			const decodedTxn = decodeObj(
-				convertBase64ToUnit8Array(this.txInput)
+				convertBase64ToUint8Array(this.txInput)
 			) as EncodedSignedTransaction;
 
 			const txID = algosdk.Transaction.from_obj_for_encoding(
@@ -197,9 +203,9 @@ export default defineComponent({
 				this.txInputError = "";
 				try {
 					// decode msgpack to unit8Array
-					const decodedTx = algosdk.decodeSignedTransaction(
-						convertBase64ToUnit8Array(this.txInput)
-					);
+					const decodedTx = algosdk.decodeObj(
+						convertBase64ToUint8Array(this.txInput)
+					) as EncodedSignedTransaction;
 					this.txOutput = formatJSON(prettifyTransaction(decodedTx));
 				} catch (error) {
 					this.txInputError = error.message;

@@ -3,7 +3,8 @@ import {
 	EncodedSignedTransaction,
 	SignedTransaction,
 } from "algosdk";
-export function convertBase64ToUnit8Array(input: string): Uint8Array {
+
+export function convertBase64ToUint8Array(input: string): Uint8Array {
 	return Uint8Array.from(Buffer.from(input, "base64"));
 }
 
@@ -27,8 +28,16 @@ export function prettifyTransaction(
 	}
 
 	let subsig = formatTransaction.msig?.subsig;
+	if (tx.sgnr) {
+		formatTransaction.sgnr = convertToBase64(tx.sgnr);
+	}
 	// encoding the uint8Array values to base64
 	for (const key in txn) {
+		if (key === "from" || key === "to") {
+			if (txn[key]?.publicKey) {
+				txn[key] = encodeAddress(txn[key].publicKey);
+			}
+		}
 		if (ArrayBuffer.isView(txn[key])) {
 			if (key === "rcv" || key === "snd") {
 				txn[key] = encodeAddress(txn[key]);

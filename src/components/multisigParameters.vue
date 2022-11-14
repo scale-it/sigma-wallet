@@ -56,7 +56,7 @@
 
 <script lang="ts">
 import { MultisignatureParam } from "@/types";
-import { convertBase64ToUnit8Array, copyToClipboard } from "@/utilities";
+import { convertBase64ToUint8Array, copyToClipboard } from "@/utilities";
 import {
 	CheckCircleOutlined,
 	CloseCircleOutlined,
@@ -99,7 +99,7 @@ export default defineComponent({
 		multiParams() {
 			this.input = this.inputBase64;
 			let jsonObject = algosdk.decodeObj(
-				convertBase64ToUnit8Array(this.input)
+				convertBase64ToUint8Array(this.input)
 			) as algosdk.EncodedSignedTransaction;
 			const mparams = jsonObject.msig as algosdk.EncodedMultisig; //get information from subsig
 			this.mparams.threshold = mparams.thr;
