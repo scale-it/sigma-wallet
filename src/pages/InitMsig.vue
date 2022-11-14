@@ -190,8 +190,8 @@ export default defineComponent({
 			unsignedInput: "",
 			addresses,
 			newAddress: "",
-			version: 0,
-			threshold: 0,
+			version: 1,
+			threshold: 1,
 			key,
 			onTabChange,
 			tabList,
@@ -200,6 +200,7 @@ export default defineComponent({
 			Tabs,
 			createTxn: false,
 			createdMsigTxnBase64: "",
+			id: 0,
 		};
 	},
 	methods: {
@@ -226,7 +227,7 @@ export default defineComponent({
 					throw new Error("Address already exists.");
 				}
 				this.addresses.push({
-					id: id++,
+					id: this.id++,
 					address: this.newAddress,
 				});
 				this.newAddress = "";
@@ -259,8 +260,8 @@ export default defineComponent({
 					);
 				}
 
-				let version = this.version * 1;
-				let threshold = this.threshold * 1;
+				let version = +this.version;
+				let threshold = +this.threshold;
 
 				const multisigParams = {
 					version: version,
@@ -278,14 +279,15 @@ export default defineComponent({
 					msig: { v: version, thr: threshold, subsig: subsig },
 					txn: txn.get_obj_for_encoding(),
 				};
+				const base64 = convertToBase64(encodeObj(msigTxn));
 				// display created msig txn in output preview (if create txn is clicked)
 				if (this.createTxn) {
-					this.contentList.MSG_PACK = convertToBase64(encodeObj(msigTxn));
+					this.contentList.MSG_PACK = base64;
 					this.contentList.JSON = formatJSON(prettifyTransaction(msigTxn));
 					this.key = "MSG_PACK";
 					openSuccessNotificationWithIcon(TXN_CREATED_SUCCESSFUL);
 				}
-				this.createdMsigTxnBase64 = convertToBase64(encodeObj(msigTxn));
+				this.createdMsigTxnBase64 = base64;
 				return multisigParams;
 			} catch (error) {
 				this.displayError(error);
