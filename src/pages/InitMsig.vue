@@ -159,8 +159,6 @@ import algosdk, { decodeAddress, encodeObj } from "algosdk";
 import WalletStore from "@/store/WalletStore";
 import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
 
-let id = 0;
-
 export default defineComponent({
 	name: "MsigTx Creator",
 	components: {

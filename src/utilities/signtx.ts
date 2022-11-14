@@ -1,7 +1,12 @@
 import WalletStore from "@/store/WalletStore";
 import { JsonPayload, WalletMultisigMetadata } from "@/types";
 import { MyAlgoWalletSession, WebMode } from "@algo-builder/web";
-import algosdk, { EncodedSignedTransaction, EncodedTransaction, encodeObj, SignedTransaction, Transaction } from "algosdk";
+import algosdk, {
+	EncodedSignedTransaction,
+	EncodedTransaction,
+	encodeObj,
+	Transaction,
+} from "algosdk";
 import { toRaw } from "vue";
 import { convertBase64ToUint8Array, convertToBase64 } from "./convert";
 
@@ -28,12 +33,12 @@ export async function signMultisigUsingMyAlgoWallet(
 			(sig) => sig.s?.length
 		);
 		const myAlgoSignedTxn = algosdk.decodeSignedTransaction(blob2);
-		const encodedTxn = { ...myAlgoSignedTxn, txn: myAlgoSignedTxn.txn.get_obj_for_encoding() } as EncodedSignedTransaction
+		const encodedTxn = {
+			...myAlgoSignedTxn,
+			txn: myAlgoSignedTxn.txn.get_obj_for_encoding(),
+		} as EncodedSignedTransaction;
 
-		if (
-			typeof signedIndex === "number" &&
-			encodedTxn.msig?.subsig.length
-		) {
+		if (typeof signedIndex === "number" && encodedTxn.msig?.subsig.length) {
 			encodedTxn.msig.subsig[signedIndex].s =
 				initialSignedMsig?.subsig[signedIndex].s;
 		}
