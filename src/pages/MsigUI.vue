@@ -72,7 +72,6 @@ import {
 	SIGN_SUCCESSFUL,
 	tabList,
 } from "@/constants";
-import { JsonPayload } from "@algo-builder/web/build/algo-signer-types";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
 	convertBase64ToUint8Array,
@@ -141,7 +140,6 @@ export default defineComponent({
 		async sign() {
 			let txnBase64 = "";
 			txnBase64 = this.unsignedJson;
-
 			try {
 				if (this.walletStore.walletKind) {
 					assertAddrPartOfMultisig(
@@ -160,7 +158,7 @@ export default defineComponent({
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));
 							this.signed = true;
-							this.key = "JSON";
+							this.key = "MSG_PACK";
 							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 							break;
 						}
@@ -189,7 +187,7 @@ export default defineComponent({
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));
 							this.signed = true;
-							this.key = "JSON";
+							this.key = "MSG_PACK";
 							openSuccessNotificationWithIcon(SIGN_SUCCESSFUL);
 							break;
 						}
@@ -202,7 +200,7 @@ export default defineComponent({
 							break;
 						}
 					}
-				} else throw Error("Please connect your wallet.");
+				} else throw Error(NO_WALLET);
 			} catch (error) {
 				this.displayError(error);
 				console.log(error);
