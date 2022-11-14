@@ -4,8 +4,14 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Partial sign transaction</h3>
 				<p>
-					Add a new or a partially signed transaction in base64 Msgpack and sign
-					it by connecting your account using web wallets.
+					Add a new or a partially
+					<a
+						href="https://algorand.github.io/js-algorand-sdk/interfaces/EncodedSignedTransaction.html"
+						target="_blank"
+						>Encoded Signed Transaction
+					</a>
+					in base64 Msgpack and sign it by connecting your account using web
+					wallets.
 				</p>
 				<div class="sign_field">
 					<a-textarea
@@ -25,10 +31,9 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
 				<p>
-					This is a preview of your multisigned transaction which you can see in
-					JSON or base64 Msgpack. Once all required signatures are aggregated
-					(i.e minimum threshold is reached), you can send the transaction using
-					the
+					This is a preview of your Encoded Signed Transaction in JSON or base64
+					Msgpack format. Once all required signatures are aggregated (i.e
+					minimum threshold is reached), you can send the transaction using the
 					<a @click="propsHomeTabChange(Tabs.TxSender)">Tx Sender</a> Tab.
 				</p>
 				<a-card

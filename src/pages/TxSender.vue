@@ -4,8 +4,13 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
 				<h2>Transaction Input</h2>
 				<p>
-					Add a transaction in base64 Msgpack format and send it to the Algorand
-					blockchain.
+					Add a
+					<a
+						href="https://algorand.github.io/js-algorand-sdk/interfaces/EncodedSignedTransaction.html"
+						target="_blank"
+						>Encoded Signed Transaction
+					</a>
+					in base64 Msgpack format and send it to the Algorand blockchain.
 				</p>
 				<a-textarea
 					placeholder="Base64 msgpack"
@@ -27,7 +32,9 @@
 			</a-col>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 12, offset: 2 }">
 				<h2>Transaction preview</h2>
-				<p>This is the preview of your signed transaction in JSON format.</p>
+				<p>
+					This is the preview of your Encoded Signed Transaction in JSON format.
+				</p>
 				<a-textarea
 					class="text_area"
 					:style="txOutput.length"

@@ -9,7 +9,7 @@
 					<a
 						href="https://algorand.github.io/js-algorand-sdk/classes/Transaction.html"
 						target="_blank"
-						>algosdk.Transaction</a
+						>Transaction</a
 					>
 					in base64 Msgpack.
 				</p>
@@ -100,8 +100,9 @@
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11, offset: 2 }">
 				<h3>Transaction preview</h3>
 				<p>
-					This is the preview of a new multisigature transaction created using
-					the parameters you provided in left column. You can sign it in the
+					This is the preview of a new multisigature Signed Encoded Transaction
+					created using the parameters you provided in left column. You can sign
+					it in the
 					<a @click="propsHomeTabChange(Tabs.Msig)">MultiSig</a> Tab.
 				</p>
 				<a-card

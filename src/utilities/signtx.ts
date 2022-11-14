@@ -1,7 +1,7 @@
 import WalletStore from "@/store/WalletStore";
 import { JsonPayload, WalletMultisigMetadata } from "@/types";
 import { MyAlgoWalletSession, WebMode } from "@algo-builder/web";
-import algosdk, { EncodedTransaction, encodeObj, Transaction } from "algosdk";
+import algosdk, { EncodedSignedTransaction, EncodedTransaction, encodeObj, SignedTransaction, Transaction } from "algosdk";
 import { toRaw } from "vue";
 import { convertBase64ToUint8Array, convertToBase64 } from "./convert";
 
@@ -28,15 +28,17 @@ export async function signMultisigUsingMyAlgoWallet(
 			(sig) => sig.s?.length
 		);
 		const myAlgoSignedTxn = algosdk.decodeSignedTransaction(blob2);
+		const encodedTxn = { ...myAlgoSignedTxn, txn: myAlgoSignedTxn.txn.get_obj_for_encoding() } as EncodedSignedTransaction
+
 		if (
 			typeof signedIndex === "number" &&
-			myAlgoSignedTxn.msig?.subsig.length
+			encodedTxn.msig?.subsig.length
 		) {
-			myAlgoSignedTxn.msig.subsig[signedIndex].s =
+			encodedTxn.msig.subsig[signedIndex].s =
 				initialSignedMsig?.subsig[signedIndex].s;
 		}
-		const outputBase64 = convertToBase64(encodeObj(myAlgoSignedTxn));
-		return { base64: outputBase64, json: myAlgoSignedTxn };
+		const outputBase64 = convertToBase64(encodeObj(encodedTxn));
+		return { base64: outputBase64, json: encodedTxn };
 	} catch (error) {
 		console.error(error);
 		throw error;
