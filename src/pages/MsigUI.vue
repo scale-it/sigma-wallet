@@ -1,10 +1,11 @@
 <template>
 	<a-layout-content class="content_sign">
+		<ErrorBlock :error="error" :update-error="(val:string) => (error = val)" />
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Partial sign transaction</h3>
 				<p>
-					Add a new or a partially
+					Add a new or a partially signed
 					<a
 						href="https://algorand.github.io/js-algorand-sdk/interfaces/EncodedSignedTransaction.html"
 						target="_blank"
@@ -76,6 +77,7 @@ import {
 	openSuccessNotificationWithIcon,
 	SIGN_SUCCESSFUL,
 	tabList,
+	ERROR_TITLE,
 } from "@/constants";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
@@ -86,11 +88,13 @@ import {
 	assertAddrPartOfMultisig,
 	signMultisigUsingAlgosigner,
 } from "@/utilities";
+import ErrorBlock from "@/components/ErrorBlock.vue";
 
 export default defineComponent({
 	name: "Multisignature UI",
 	components: {
 		MultisigParameters,
+		ErrorBlock,
 	},
 	props: {
 		onHomeTabChange: Function,
@@ -129,6 +133,7 @@ export default defineComponent({
 			onTabChange,
 			Tabs,
 			msigAddresses: [{}],
+			error: "",
 		};
 	},
 	methods: {
@@ -140,7 +145,8 @@ export default defineComponent({
 		},
 		displayError(error: Error) {
 			errorMessage(this.key);
-			openErrorNotificationWithIcon(error.message);
+			openErrorNotificationWithIcon(ERROR_TITLE);
+			this.error = error.message;
 		},
 		async sign() {
 			let txnBase64 = "";
@@ -168,26 +174,8 @@ export default defineComponent({
 							break;
 						}
 						case WalletType.ALGOSIGNER: {
-							let jsonObject = algosdk.decodeObj(
-								convertBase64ToUint8Array(txnBase64)
-							) as algosdk.EncodedSignedTransaction;
-							const mparams = jsonObject.msig as algosdk.EncodedMultisig; // get information from subsig
-
-							const version = mparams.v;
-							const threshold = mparams.thr;
-							const addr = mparams.subsig.map((signData) => {
-								let address = algosdk.encodeAddress(signData.pk) as string;
-								return address;
-							});
-
-							const multisigParams = {
-								version: version,
-								threshold: threshold,
-								addrs: addr,
-							};
 							const { base64, json } = await signMultisigUsingAlgosigner(
-								txnBase64,
-								multisigParams
+								txnBase64
 							);
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));

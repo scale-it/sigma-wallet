@@ -1,5 +1,4 @@
 import WalletStore from "@/store/WalletStore";
-import { JsonPayload, WalletMultisigMetadata } from "@/types";
 import { MyAlgoWalletSession, WebMode } from "@algo-builder/web";
 import algosdk, {
 	EncodedSignedTransaction,
@@ -50,40 +49,21 @@ export async function signMultisigUsingMyAlgoWallet(
 	}
 }
 
-export async function signMultisigUsingAlgosigner(
-	txnBase64: string,
-	multisigParams: WalletMultisigMetadata
-) {
+export async function signMultisigUsingAlgosigner(txnBase64: string) {
 	try {
 		const walletStore = WalletStore();
 		const signAlgoSigner = walletStore.webMode as WebMode;
 		const jsonObject = algosdk.decodeObj(
 			convertBase64ToUint8Array(txnBase64)
 		) as algosdk.EncodedSignedTransaction;
+		const signedTxn = await signAlgoSigner.signMsigTx(jsonObject);
 
-		const bytes = algosdk.encodeObj(jsonObject.txn);
-		const txnBase64Signing = convertToBase64(bytes); // base64 of the transaction without signature
+		const base64Blob = signedTxn.blob as string;
+		const newJson = algosdk.decodeSignedTransaction(
+			convertBase64ToUint8Array(base64Blob)
+		);
 
-		const signedTxn = await signAlgoSigner.signTransaction([
-			{
-				txn: txnBase64Signing,
-				msig: multisigParams,
-			},
-		]);
-		const json = signedTxn[0] as JsonPayload;
-
-		let combineBlob = convertBase64ToUint8Array(json.blob as string);
-
-		// we have multiple signatures
-		if (jsonObject.msig?.subsig.findIndex((item) => item.s?.length) !== -1) {
-			const blob1 = convertBase64ToUint8Array(txnBase64);
-			const blob2 = convertBase64ToUint8Array(json.blob as string);
-			combineBlob = algosdk.mergeMultisigTransactions([blob1, blob2]);
-		}
-		const newJson = algosdk.decodeSignedTransaction(combineBlob);
-		const outputBase64 = convertToBase64(combineBlob);
-
-		return { base64: outputBase64, json: newJson };
+		return { base64: base64Blob, json: newJson };
 	} catch (error) {
 		console.error(error);
 		throw error;
