@@ -12,7 +12,14 @@
 	<div class="highlight_container">
 		<code-highlight :aria-multiline="true" language="javascript">
 			<pre>
-		// Construct transaction
+		// Connect your client
+		const algodToken =
+			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+		const algodServer = "http://localhost";
+		const algodPort = 4001;
+		let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
+
+		// Construct the transaction
 		let params = await algodClient.getTransactionParams().do();
 		// comment out the next two lines to use suggested fee
 		params.fee = algosdk.ALGORAND_MIN_TX_FEE;
@@ -32,12 +39,11 @@
 			note: note,
 			suggestedParams: params,
 		});
-
 		// convert transaction to base64 for use in InitMsig
 		const base64Txn = Buffer.from(
 			algosdk.encodeObj(txn.get_obj_for_encoding())
 		).toString("base64");
-			</pre
+</pre
 			>
 		</code-highlight>
 	</div>
