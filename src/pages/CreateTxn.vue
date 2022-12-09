@@ -12,14 +12,7 @@
 	<div class="highlight_container">
 		<code-highlight :aria-multiline="true" language="javascript">
 			<pre>
-		// Connect your client
-		const algodToken =
-			"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-		const algodServer = "http://localhost";
-		const algodPort = 4001;
-		let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
-
-		// Construct the transaction
+		// Construct transaction
 		let params = await algodClient.getTransactionParams().do();
 		// comment out the next two lines to use suggested fee
 		params.fee = algosdk.ALGORAND_MIN_TX_FEE;
