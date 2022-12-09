@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@algo-builder/algob": "^6.0.0",
-		"@algo-builder/web": "^6.0.0",
+		"@algo-builder/web": "^7.0.0",
 		"@ant-design/icons-vue": "^6.1.0",
 		"algosdk": "^1.23.2",
 		"ant-design-vue": "^3.2.15",
@@ -29,6 +29,7 @@
 		"pinia": "^2.0.24",
 		"stream-browserify": "^3.0.0",
 		"vue": "^3.2.45",
+		"vue-code-highlight": "^0.7.8",
 		"vue-router": "^4.1.6"
 	},
 	"lint-staged": {

@@ -23,3 +23,8 @@ export enum Tabs {
 	TxSender,
 	InitMsig,
 }
+
+export enum EndPoint {
+	HOME_PAGE = "/",
+	CREATE_TXN = "/create-txn",
+}

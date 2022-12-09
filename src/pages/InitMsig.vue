@@ -1,15 +1,14 @@
 <template>
 	<a-layout-content class="content_sign">
+		<ErrorBlock :error="error" :update-error="(val:string) => (error = val)" />
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 11 }">
 				<h3>Unsigned transaction</h3>
 				<p>
 					Specify your multisignature transaction parameters: addresses,
 					threshold, version, along with providing the
-					<a
-						href="https://algorand.github.io/js-algorand-sdk/classes/Transaction.html"
-						target="_blank"
-						>Transaction</a
+					<router-link :to="{ path: EndPoint.CREATE_TXN }">
+						Transaction</router-link
 					>
 					in base64 Msgpack.
 				</p>
@@ -102,8 +101,10 @@
 				<p>
 					This is the preview of a new multisigature Signed Encoded Transaction
 					created using the parameters you provided in left column. You can sign
-					it in the
-					<a @click="propsHomeTabChange(Tabs.Msig)">MultiSig</a> Tab.
+					it using
+					<a @click="propsHomeTabChange(Tabs.Msig)">MultiSig</a> Tab, and send
+					it to blockchain using
+					<a @click="propsHomeTabChange(Tabs.TxSender)">TxSender</a> Tab,
 				</p>
 				<a-card
 					class="card"
@@ -133,7 +134,13 @@
 </template>
 
 <script lang="ts">
-import { contentlist, listAddresses, WalletType, Tabs } from "@/types";
+import {
+	contentlist,
+	listAddresses,
+	WalletType,
+	Tabs,
+	EndPoint,
+} from "@/types";
 import { defineComponent, ref } from "vue";
 import MultisigParameters from "@/components/multisigParameters.vue";
 import {
@@ -145,6 +152,7 @@ import {
 	openSuccessNotificationWithIcon,
 	SIGN_SUCCESSFUL,
 	TXN_CREATED_SUCCESSFUL,
+	ERROR_TITLE,
 } from "@/constants";
 import {
 	assertAddrPartOfMultisig,
@@ -158,12 +166,14 @@ import {
 import algosdk, { decodeAddress, encodeObj } from "algosdk";
 import WalletStore from "@/store/WalletStore";
 import IconWithToolTip from "@/components/IconToolTip/IconWithToolTip.vue";
+import ErrorBlock from "@/components/ErrorBlock.vue";
 
 export default defineComponent({
 	name: "MsigTx Creator",
 	components: {
 		MultisigParameters,
 		IconWithToolTip,
+		ErrorBlock,
 	},
 	props: {
 		onHomeTabChange: Function,
@@ -200,6 +210,8 @@ export default defineComponent({
 			createTxn: false,
 			createdMsigTxnBase64: "",
 			id: 0,
+			EndPoint,
+			error: "",
 		};
 	},
 	methods: {
@@ -239,7 +251,8 @@ export default defineComponent({
 		},
 		displayError(error: Error) {
 			errorMessage(this.key);
-			openErrorNotificationWithIcon(error.message);
+			openErrorNotificationWithIcon(ERROR_TITLE);
+			this.error = error.message;
 		},
 		createMultisig() {
 			try {
@@ -320,8 +333,7 @@ export default defineComponent({
 								return;
 							}
 							const { base64, json } = await signMultisigUsingAlgosigner(
-								txnBase64,
-								multisigParams
+								txnBase64
 							);
 							this.contentList.MSG_PACK = base64;
 							this.contentList.JSON = formatJSON(prettifyTransaction(json));

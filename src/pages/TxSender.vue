@@ -1,5 +1,6 @@
 <template>
 	<a-layout-content class="content_sign">
+		<ErrorBlock :error="error" :update-error="(val:string) => error = val" />
 		<a-row>
 			<a-col :xs="{ span: 24 }" :lg="{ span: 10 }">
 				<h2>Transaction Input</h2>
@@ -89,6 +90,7 @@ import {
 import algosdk, { decodeObj, EncodedSignedTransaction } from "algosdk";
 import {
 	errorMessage,
+	ERROR_TITLE,
 	loadingMessage,
 	openErrorNotificationWithIcon,
 	openSuccessNotificationWithIcon,
@@ -102,6 +104,7 @@ import {
 	WebMode,
 } from "@algo-builder/web";
 import { types } from "@algo-builder/web";
+import ErrorBlock from "@/components/ErrorBlock.vue";
 
 export default defineComponent({
 	data() {
@@ -112,8 +115,10 @@ export default defineComponent({
 			key: "SenderKey",
 			confirmedResponse: "",
 			isSendDisabled: false,
+			error: "",
 		};
 	},
+	components: { ErrorBlock },
 	setup() {
 		const walletStore = WalletStore();
 		return {
@@ -147,7 +152,8 @@ export default defineComponent({
 		},
 		displayError(error: Error) {
 			errorMessage(this.key);
-			openErrorNotificationWithIcon(error.message);
+			openErrorNotificationWithIcon(ERROR_TITLE);
+			this.error = error.message;
 		},
 		async sendTx() {
 			loadingMessage(this.key);
