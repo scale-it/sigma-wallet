@@ -39,12 +39,12 @@
 			note: note,
 			suggestedParams: params,
 		});
+
 		// convert transaction to base64 for use in InitMsig
 		const base64Txn = Buffer.from(
 			algosdk.encodeObj(txn.get_obj_for_encoding())
 		).toString("base64");
-</pre
-			>
+			</pre>
 		</code-highlight>
 	</div>
 </template>
