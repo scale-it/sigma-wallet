@@ -23,7 +23,9 @@
 					>
 					</a-textarea>
 				</div>
-				<a-button type="primary" @click="sign">SIGN</a-button>
+				<a-button type="primary" :loading="btnLoader" @click="sign"
+					>SIGN</a-button
+				>
 				<MultisigParameters
 					@getAddress="setAddresses"
 					:inputBase64="unsignedJson"
@@ -134,6 +136,7 @@ export default defineComponent({
 			Tabs,
 			msigAddresses: [{}],
 			error: "",
+			btnLoader: false,
 		};
 	},
 	methods: {
@@ -153,10 +156,12 @@ export default defineComponent({
 			txnBase64 = this.unsignedJson;
 			try {
 				if (this.walletStore.walletKind) {
-					assertAddrPartOfMultisig(
+					this.btnLoader = true;
+					await assertAddrPartOfMultisig(
 						this.msigAddresses,
 						this.walletStore.address
 					);
+					this.btnLoader = false;
 					switch (this.walletStore.walletKind) {
 						case WalletType.MY_ALGO: {
 							let jsonObject = algosdk.decodeObj(
@@ -195,8 +200,8 @@ export default defineComponent({
 					}
 				} else throw Error(NO_WALLET);
 			} catch (error) {
+				this.btnLoader = false;
 				this.displayError(error);
-				console.log(error);
 			}
 		},
 	},
