@@ -26,3 +26,9 @@ export const Action = {
 	SAVE: "Save",
 	COPY: "Copy",
 };
+
+export const AlgoExplorerIndexerURL = {
+	MAIN_NET_URL: "https://algoindexer.algoexplorerapi.io",
+	TEST_NET_URL: "https://algoindexer.testnet.algoexplorerapi.io",
+	BETA_NET_URL: "https://algoindexer.betanet.algoexplorerapi.io",
+};

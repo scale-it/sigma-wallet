@@ -91,7 +91,11 @@
 				</div>
 				<div class="margin_top_med">
 					<a-button type="primary" @click="handleCreateTxn">Create</a-button>
-					<a-button type="primary" @click="sign" class="margin_left_med"
+					<a-button
+						type="primary"
+						@click="sign"
+						:loading="btnLoader"
+						class="margin_left_med"
 						>Create And Sign</a-button
 					>
 				</div>
@@ -212,6 +216,7 @@ export default defineComponent({
 			id: 0,
 			EndPoint,
 			error: "",
+			btnLoader: false,
 		};
 	},
 	methods: {
@@ -309,7 +314,12 @@ export default defineComponent({
 			this.createTxn = false;
 			try {
 				if (this.walletStore.walletKind) {
-					assertAddrPartOfMultisig(this.addresses, this.walletStore.address);
+					this.btnLoader = true;
+					await assertAddrPartOfMultisig(
+						this.addresses,
+						this.walletStore.address
+					);
+					this.btnLoader = false;
 					const multisigParams = this.createMultisig();
 					let txnBase64 = "";
 					txnBase64 = this.createdMsigTxnBase64;
@@ -352,6 +362,7 @@ export default defineComponent({
 					}
 				} else throw Error(NO_WALLET);
 			} catch (error) {
+				this.btnLoader = false;
 				this.displayError(error);
 			}
 		},
